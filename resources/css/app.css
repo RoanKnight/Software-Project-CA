@@ -1,0 +1,19 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.dark {
+    --background: 21, 32, 43;
+    --title: 255, 255, 255;
+    --spanBG: 229, 231, 235;
+    --spanText: 0, 0, 0;
+    --pText: 255, 255, 255;
+}
+
+.light {
+    --background: 245, 245, 245;
+    --title: 0, 0, 0;
+    --spanBG: 229, 231, 235;
+    --spanText: 0, 0, 0;
+    --pText: 0, 0, 0;
+}
