@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\SolarPanelController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -17,6 +18,14 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', function () {
     return view('welcome');
 });
+
+Route::get('/example', function () {
+    return view('example');
+});
+
+Route::get('/current-date-time', [SolarPanelController::class, 'getCurrentDateTime']);
+
+Route::get('/update-solar-data', [SolarPanelController::class, 'updateSolarData']);
 
 Route::get('/dashboard', function () {
     return view('dashboard');
