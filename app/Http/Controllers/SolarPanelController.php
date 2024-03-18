@@ -28,14 +28,12 @@ class SolarPanelController extends Controller
     }
 
     if ($dateEntry === null) {
-      // If the date entry does not exist, create it with an empty hours array
       $dateEntry = [
         'date' => $currentDate,
         'hours' => []
       ];
       $data[] = &$dateEntry;
     } else {
-      // If the date entry exists, add the next hour entry only if the last hour is not '23:00'
       $lastHourEntry = end($dateEntry['hours']);
       if ($lastHourEntry['hour'] === '23:00') {
         return response()->json('Cannot add any more objects for the day', 200);

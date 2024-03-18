@@ -15,37 +15,83 @@ use Illuminate\View\View;
 
 class RegisteredUserController extends Controller
 {
-    /**
-     * Display the registration view.
-     */
-    public function create(): View
-    {
-        return view('auth.register');
-    }
 
-    /**
-     * Handle an incoming registration request.
-     *
-     * @throws \Illuminate\Validation\ValidationException
-     */
-    public function store(Request $request): RedirectResponse
-    {
-        $request->validate([
-            'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class],
-            'password' => ['required', 'confirmed', Rules\Password::defaults()],
-        ]);
+  public function __construct() {
+    $this->middleware('auth', ['except' => ['create', 'store']]);
+    $this->middleware('role:admin', ['only' => ['promote', 'delete', 'restore', 'index']]);
+  }
 
-        $user = User::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'password' => Hash::make($request->password),
-        ]);
+  public function index()
+  {
+    $users = User::all();
 
-        event(new Registered($user));
+    return view('users.index', [
+      'users' => $users,
+    ]);
+  }
 
-        Auth::login($user);
+  public function create(): View
+  {
+    return view('auth.register');
+  }
 
-        return redirect(RouteServiceProvider::HOME);
-    }
+  /**
+   * Handle an incoming registration request.
+   *
+   * @throws \Illuminate\Validation\ValidationException
+   */
+  public function store(Request $request): RedirectResponse
+  {
+    $request->validate([
+      'name' => ['required', 'string', 'max:255'],
+      'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:' . User::class],
+      'password' => ['required', 'confirmed', Rules\Password::defaults()],
+    ]);
+
+    $user = User::create([
+      'name' => $request->name,
+      'email' => $request->email,
+      'password' => Hash::make($request->password),
+      'role' => User::ROLE_USER,
+    ]);
+
+    event(new Registered($user));
+
+    Auth::login($user);
+
+    return redirect(RouteServiceProvider::HOME);
+  }
+
+  public function show(User $user): View
+  {
+    return view('users.show', [
+      'user' => $user,
+    ]);
+  }
+
+  public function promoteToAdmin(User $user): RedirectResponse
+  {
+    $user->role = User::ROLE_ADMIN;
+    $user->save();
+
+    return redirect()->back()->with('success', 'User promoted to admin successfully');
+  }
+
+  public function destroy(string $id)
+  {
+    $user = User::findOrFail($id);
+
+    $user->update(['deleted' => true]);
+
+    return redirect()->route('users.index')->with('status', 'User deleted successfully');
+  }
+
+  public function restore(string $id)
+  {
+    $user = User::findOrFail($id);
+
+    $user->update(['deleted' => false]);
+
+    return redirect()->route('users.index')->with('status', 'User restored successfully');
+  }
 }
