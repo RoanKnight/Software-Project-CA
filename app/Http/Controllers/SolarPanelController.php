@@ -7,6 +7,13 @@ use Carbon\Carbon;
 
 class SolarPanelController extends Controller
 {
+
+  public function __construct()
+  {
+    $this->middleware('auth', ['except' => []]);
+    $this->middleware('role:admin', ['only' => ['delete', 'restore', 'index']]);
+  }
+  
   public function getCurrentDateTime()
   {
     $this->updateSolarData();

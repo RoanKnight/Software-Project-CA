@@ -12,11 +12,11 @@ return new class extends Migration
   public function up(): void
   {
     Schema::create('locations', function (Blueprint $table) {
-      $table->id();
+      $table->string('MPRN')->primary();
       $table->timestamps();
       $table->string('address');
-      $table->string('MPRN');
-      $table->foreignId('user_id');
+      $table->string('EirCode');
+      $table->foreignId('user_id')->constrained();
       $table->boolean('deleted')->default(false);
     });
   }

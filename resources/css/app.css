@@ -3,17 +3,17 @@
 @tailwind utilities;
 
 .dark {
-    --background: 21, 32, 43;
-    --title: 255, 255, 255;
-    --spanBG: 229, 231, 235;
-    --spanText: 0, 0, 0;
-    --pText: 255, 255, 255;
+  --background: 18, 18, 18;
+  --tableHeadingText: 255, 255, 255;
+  --tableHeadingBG: 40, 40, 40;
+  --tableRowBG: 55, 55, 55;
+  --tableRowText: 255 255 255;
 }
 
 .light {
-    --background: 245, 245, 245;
-    --title: 0, 0, 0;
-    --spanBG: 229, 231, 235;
-    --spanText: 0, 0, 0;
-    --pText: 0, 0, 0;
+  --background: 240, 240, 240;
+  --tableHeadingText: 0, 0, 0;
+  --tableHeadingBG: 235, 235, 235;
+  --tableRowBG: 255, 255, 255;
+  --tableRowText: 20, 20, 20;
 }

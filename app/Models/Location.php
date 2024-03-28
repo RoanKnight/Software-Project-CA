@@ -9,11 +9,16 @@ class Location extends Model
 {
   use HasFactory;
 
+  protected $primaryKey = 'MPRN';
+  public $incrementing = false;
+  protected $keyType = 'string';
+
   protected $fillable = [
-    'address',
     'MPRN',
-    'user_id',
-    'deleted'
+    'address',
+    'EirCode',
+    'deleted',
+    'user_id'
   ];
 
   public function user()

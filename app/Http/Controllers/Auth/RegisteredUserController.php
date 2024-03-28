@@ -7,6 +7,7 @@ use App\Models\User;
 use App\Providers\RouteServiceProvider;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -16,7 +17,8 @@ use Illuminate\View\View;
 class RegisteredUserController extends Controller
 {
 
-  public function __construct() {
+  public function __construct()
+  {
     $this->middleware('auth', ['except' => ['create', 'store']]);
     $this->middleware('role:admin', ['only' => ['promote', 'delete', 'restore', 'index']]);
   }
@@ -54,6 +56,10 @@ class RegisteredUserController extends Controller
       'password' => Hash::make($request->password),
       'role' => User::ROLE_USER,
     ]);
+
+    // Use the user's email for the directory
+    $userDirectory = 'users/' . $user->email;
+    Storage::makeDirectory($userDirectory);
 
     event(new Registered($user));
 

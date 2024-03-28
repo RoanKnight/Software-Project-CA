@@ -31,13 +31,16 @@
           <thead class="text-xs uppercase bg-tableHeadingBG">
             <tr>
               <th scope="col" class="px-6 py-3 text-tableHeadingText">
-                Name
+                MPRN
               </th>
               <th scope="col" class="px-6 py-3 text-tableHeadingText">
-                Email
+                Address
               </th>
               <th scope="col" class="px-6 py-3 text-tableHeadingText">
-                Role
+                EirCode
+              </th>
+              <th scope="col" class="px-6 py-3 text-tableHeadingText">
+                User ID
               </th>
               <th scope="col" class="px-6 py-3 text-tableHeadingText">
                 Deleted
@@ -49,33 +52,36 @@
           </thead>
 
           <!-- Table Body -->
-          @forelse($users as $user)
+          @forelse($locations as $location)
             <tr class="bg-tableRowBG">
               <td scope="row" class="px-6 py-4 font-bold text-tableRowText whitespace-nowrap">
-                {{ $user->name }}
+                {{ $location->MPRN }}
               </td>
               <td class="px-6 py-4 text-tableRowText">
-                {{ $user->email }}
+                {{ $location->address }}
               </td>
               <td class="px-6 py-4 text-tableRowText">
-                {{ $user->role }}
+                {{ $location->EirCode }}
+              </td>
+              <td class="px-6 py-4 text-tableRowText">
+                {{ $location->user_id }}
               </td>
               <td class="px-6 py-4 text-tableRowText">
                 <!-- Display 'True' if deleted, 'False' otherwise -->
-                @if ($user->deleted)
+                @if ($location->deleted)
                   <span class="text-red-500">True</span>
                 @else
                   <span class="text-green-500">False</span>
                 @endif
               </td>
               <td class="px-6 py-4">
-                <!-- Link to the show page for the user -->
-                <a href="{{ route('users.show', $user->id) }}" class="text-blue-500 hover:text-blue-700 underline">View</a>
+                <!-- Link to the show page for the location -->
+                <a href="{{ route('locations.show', $location->MPRN) }}" class="text-blue-500 hover:text-blue-700 underline">View</a>
               </td>
             </tr>
           @empty
-            <!-- Displayed when no users are found -->
-            <h4>No Users found!</h4>
+            <!-- Displayed when no locations are found -->
+            <h4>No Locations found!</h4>
           @endforelse
         </table>
       </div>
