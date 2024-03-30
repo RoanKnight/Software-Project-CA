@@ -13,10 +13,6 @@ Route::get('/example', function () {
   return view('example');
 });
 
-Route::get('/current-date-time', [SolarPanelController::class, 'getCurrentDateTime']);
-
-Route::get('/update-solar-data', [SolarPanelController::class, 'updateSolarData']);
-
 Route::get('/dashboard', function () {
   return view('dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
@@ -43,6 +39,16 @@ Route::prefix('locations')->group(function () {
   Route::get('/{location}', [LocationController::class, 'show'])->name('locations.show');
   Route::delete('/{location}', [LocationController::class, 'destroy'])->name('locations.destroy');
   Route::patch('/{MPRN}/restore', [LocationController::class, 'restore'])->name('locations.restore');
+});
+
+Route::prefix('solar')->group(function () {
+  Route::get('/', [SolarPanelController::class, 'index'])->name('solar.index');
+  Route::get('/create', [SolarPanelController::class, 'create'])->name('solar.create');
+  Route::post('/', [SolarPanelController::class, 'store'])->name('solar.store');
+  Route::get('/update-solar-data', [SolarPanelController::class, 'updateSolarData'])->name('solar.updateSolarData');
+  Route::get('/{solarPanel}', [SolarPanelController::class, 'show'])->name('solar.show');
+  Route::delete('/{solarPanel}', [SolarPanelController::class, 'destroy'])->name('solar.destroy');
+  Route::patch('/{solarPanel}/restore', [SolarPanelController::class, 'restore'])->name('solar.restore');
 });
 
 require __DIR__ . '/auth.php';

@@ -6,7 +6,7 @@
 
 @section('header')
   <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
-    Location Details
+    Solar Panel Details
   </h2>
 @endsection
 
@@ -17,13 +17,10 @@
         <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
           <tr>
             <th scope="col" class="px-6 py-3">
-              MPRN
+              ID
             </th>
             <th scope="col" class="px-6 py-3">
-              Address
-            </th>
-            <th scope="col" class="px-6 py-3">
-              EirCode
+              Location Address
             </th>
             <th scope="col" class="px-6 py-3">
               Deleted
@@ -33,16 +30,13 @@
         <tbody>
           <tr class="bg-white border-b dark:bg-gray-900 dark:border-gray-700">
             <td scope="row" class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-              {{ $location->MPRN }}
+              {{ $solarPanel->id }}
             </td>
             <td class="px-6 py-4">
-              {{ $location->address }}
+              {{ $solarPanel->location->address }}
             </td>
             <td class="px-6 py-4">
-              {{ $location->EirCode }}
-            </td>
-            <td class="px-6 py-4">
-              @if ($location->deleted)
+              @if ($solarPanel->deleted)
                 <span class="text-red-500">True</span>
               @else
                 <span class="text-green-500">False</span>
@@ -52,14 +46,14 @@
         </tbody>
       </table>
     </div>
-    @if ($location->deleted)
-      <form method="POST" action="{{ route('locations.restore', $location->MPRN) }}">
+    @if ($solarPanel->deleted)
+      <form method="POST" action="{{ route('solar.restore', $solarPanel->id) }}">
         @csrf
         @method('PATCH')
         <button type="submit" class="px-4 py-2 mt-3 text-white bg-green-500 rounded hover:bg-green-700">Restore</button>
       </form>
     @else
-      <form method="POST" action="{{ route('locations.destroy', $location->MPRN) }}">
+      <form method="POST" action="{{ route('solar.destroy', $solarPanel->id) }}">
         @csrf
         @method('DELETE')
         <button type="submit" class="px-4 py-2 mt-3 text-white bg-red-500 rounded hover:bg-red-700">Delete</button>

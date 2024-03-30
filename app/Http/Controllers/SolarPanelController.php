@@ -3,7 +3,12 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Models\SolarPanel;
+use App\Models\Location;
+use App\Models\User;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Storage;
+use Auth;
 
 class SolarPanelController extends Controller
 {
@@ -13,45 +18,130 @@ class SolarPanelController extends Controller
     $this->middleware('auth', ['except' => []]);
     $this->middleware('role:admin', ['only' => ['delete', 'restore', 'index']]);
   }
-  
-  public function getCurrentDateTime()
+
+  public function index()
   {
-    $this->updateSolarData();
-    return Carbon::now()->format('d-m-Y H:i:s');
+    $solarPanels = SolarPanel::all();
+    $locations = Location::all();
+    return view('solar.index', [
+      'solarPanels' => $solarPanels,
+      'locations' => $locations
+    ]);
+  }
+
+  public function create()
+  {
+    $locations = Location::all();
+    return view('solar.create', [
+      'locations' => $locations,
+    ]);
+  }
+
+  public function store(Request $request)
+  {
+    $rules = [
+      'location_id' => 'required|exists:locations,MPRN',
+    ];
+
+    $messages = [
+      'location_id.required' => 'The location field is required.'
+    ];
+
+    $request->validate($rules, $messages);
+
+    $solarPanel = new SolarPanel;
+    $solarPanel->location_id = $request->location_id;
+    $solarPanel->save();
+
+    $location = Location::where('MPRN', $request->location_id)->first();
+    $locationDirectory = 'users/' . Auth::user()->email . '/' . $location->address;
+
+    if (!Storage::exists($locationDirectory)) {
+      return redirect()->back()->with('error', 'Location directory does not exist');
+    }
+
+    $solarJsonPath = $locationDirectory . '/solar.json';
+    Storage::put($solarJsonPath, json_encode([]));
+
+    return redirect()->route('solar.index')->with('status', 'Created a new solar panel');
   }
 
   public function updateSolarData()
   {
-    $path = resource_path('js/solar.json');
-    $data = json_decode(file_get_contents($path), true);
-    $currentDate = Carbon::now()->format('d-m-Y');
+    $users = User::all();
 
-    $dateEntry = null;
-    foreach ($data as &$entry) {
-      if ($entry['date'] === $currentDate) {
-        $dateEntry = &$entry;
-        break;
+    foreach ($users as $user) {
+      $locations = Location::where('user_id', $user->id)->get();
+
+      foreach ($locations as $location) {
+        $path = 'users/' . $user->email . '/' . $location->address . '/solar.json';
+        if (!Storage::exists($path)) {
+          continue;
+        }
+
+        $data = json_decode(Storage::get($path), true);
+        $currentDate = Carbon::now()->format('d-m-Y');
+
+        $dateEntry = null;
+        foreach ($data as &$entry) {
+          if ($entry['date'] === $currentDate) {
+            $dateEntry = &$entry;
+            break;
+          }
+        }
+
+        if ($dateEntry === null) {
+          $dateEntry = [
+            'date' => $currentDate,
+            'hours' => []
+          ];
+          $data[] = &$dateEntry;
+          Storage::put($path, json_encode($data, JSON_PRETTY_PRINT));
+          continue;
+        }
+
+        $lastHourEntry = end($dateEntry['hours']);
+        if ($lastHourEntry !== false && $lastHourEntry['hour'] === '23:00') {
+          continue;
+        }
+
+        $nextHour = $lastHourEntry && isset($lastHourEntry['hour']) ? ((int) substr($lastHourEntry['hour'], 0, 2) + 1) % 24 : 0;
+        $dateEntry['hours'][] = [
+          'hour' => sprintf('%02d:00', $nextHour),
+          'energyGeneration_kwh' => rand(200, 500) / 10.0,
+        ];
+
+        Storage::put($path, json_encode($data, JSON_PRETTY_PRINT));
       }
     }
 
-    if ($dateEntry === null) {
-      $dateEntry = [
-        'date' => $currentDate,
-        'hours' => []
-      ];
-      $data[] = &$dateEntry;
-    } else {
-      $lastHourEntry = end($dateEntry['hours']);
-      if ($lastHourEntry['hour'] === '23:00') {
-        return response()->json('Cannot add any more objects for the day', 200);
-      }
-      $nextHour = $lastHourEntry ? ((int)substr($lastHourEntry['hour'], 0, 2) + 1) % 24 : 0;
-      $dateEntry['hours'][] = [
-        'hour' => sprintf('%02d:00', $nextHour),
-        'energyGeneration_kwh' => rand(200, 500) / 10.0,
-      ];
-    }
+    return response()->json('Solar data updated for all users and locations');
+  }
 
-    file_put_contents($path, json_encode($data, JSON_PRETTY_PRINT));
+  public function show(string $id)
+  {
+    $solarPanel = SolarPanel::findOrFail($id);
+
+    return view('solar.show', [
+      'solarPanel' => $solarPanel
+    ]);
+  }
+
+  public function destroy(string $id)
+  {
+    $solarPanel = SolarPanel::findOrFail($id);
+
+    $solarPanel->update(['deleted' => true]);
+
+    return redirect()->route('solar.index')->with('status', 'Solar panel deleted successfully');
+  }
+
+  public function restore(string $id)
+  {
+    $solarPanel = SolarPanel::findOrFail($id);
+
+    $solarPanel->update(['deleted' => false]);
+
+    return redirect()->route('solar.index')->with('status', 'Solar panel restored successfully');
   }
 }

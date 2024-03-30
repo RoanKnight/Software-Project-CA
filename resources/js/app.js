@@ -14,23 +14,23 @@ function printTimeUntilNextHour() {
 
 document.addEventListener("DOMContentLoaded", function () {
 
-function updateSolarData() {
-  fetch("/update-solar-data")
-    .then((response) => response.json())
-    .then((data) => console.log(data.message));
-
+  function updateSolarData() {
+    fetch("/solar/update-solar-data")
+      .then((response) => response.json())
+      .then((data) => console.log(data));
+  
+    let now = new Date();
+    let delay = ((60 - now.getMinutes()) * 60 - now.getSeconds()) * 1000;
+  
+    setTimeout(updateSolarData, delay);
+  }
+  
   let now = new Date();
   let delay = ((60 - now.getMinutes()) * 60 - now.getSeconds()) * 1000;
-
+  
   setTimeout(updateSolarData, delay);
-}
-
-let now = new Date();
-let delay = ((60 - now.getMinutes()) * 60 - now.getSeconds()) * 1000;
-
-setTimeout(updateSolarData, delay);
-
-printTimeUntilNextHour();
+  
+  printTimeUntilNextHour();
 
 document.body.classList.add("light");
 
