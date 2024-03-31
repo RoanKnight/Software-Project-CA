@@ -2,6 +2,7 @@
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\SolarPanelController;
 use App\Http\Controllers\ElectricityUsageController;
+use App\Http\Controllers\ChargingStationController;
 use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\LocationController;
 use Illuminate\Support\Facades\Route;
@@ -60,6 +61,15 @@ Route::prefix('electricity')->group(function () {
   Route::get('/{electricityUsage}', [ElectricityUsageController::class, 'show'])->name('electricity.show');
   Route::delete('/{electricityUsage}', [ElectricityUsageController::class, 'destroy'])->name('electricity.destroy');
   Route::patch('/{electricityUsage}/restore', [ElectricityUsageController::class, 'restore'])->name('electricity.restore');
+});
+
+Route::prefix('chargingStations')->group(function () {
+  Route::get('/', [ChargingStationController::class, 'index'])->name('chargingStations.index');
+  Route::get('/create', [ChargingStationController::class, 'create'])->name('chargingStations.create');
+  Route::post('/', [ChargingStationController::class, 'store'])->name('chargingStations.store');
+  Route::get('/{chargingStation}', [ChargingStationController::class, 'show'])->name('chargingStations.show');
+  Route::delete('/{chargingStation}', [ChargingStationController::class, 'destroy'])->name('chargingStations.destroy');
+  Route::patch('/{chargingStation}/restore', [ChargingStationController::class, 'restore'])->name('chargingStations.restore');
 });
 
 require __DIR__ . '/auth.php';
