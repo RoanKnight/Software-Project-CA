@@ -7,5 +7,15 @@ use Illuminate\Database\Eloquent\Model;
 
 class ElectricityUsage extends Model
 {
-    use HasFactory;
+  use HasFactory;
+
+  protected $fillable = [
+    'location_MPRN',
+    'deleted'
+  ];
+
+  public function location()
+  {
+    return $this->belongsTo(Location::class, 'location_id', 'MPRN');
+  }
 }

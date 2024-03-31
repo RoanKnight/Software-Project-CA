@@ -12,6 +12,15 @@ function printTimeUntilNextHour() {
   );
 }
 
+function printTimeUntilNextFiveMinutes() {
+  let now = new Date();
+  let minutesUntilNextFive = 4 - (now.getMinutes() % 5);
+  let secondsUntilNextFive = 59 - now.getSeconds();
+  console.log(
+    `Time until next 5 minutes: ${minutesUntilNextFive} minutes and ${secondsUntilNextFive} seconds`
+  );
+}
+
 document.addEventListener("DOMContentLoaded", function () {
 
   function updateSolarData() {
@@ -24,13 +33,27 @@ document.addEventListener("DOMContentLoaded", function () {
   
     setTimeout(updateSolarData, delay);
   }
+
+  function updateElectricityData() {
+    fetch("/electricity/update-electricity-data")
+      .then((response) => response.json())
+      .then((data) => console.log(data));
+  
+    let now = new Date();
+    let delay = ((5 - now.getMinutes() % 5) * 60 - now.getSeconds()) * 1000;
+  
+    setTimeout(updateElectricityData, delay);
+  }
   
   let now = new Date();
-  let delay = ((60 - now.getMinutes()) * 60 - now.getSeconds()) * 1000;
+  let delaySolar = ((60 - now.getMinutes()) * 60 - now.getSeconds()) * 1000;
+  let delayElectricity = ((5 - now.getMinutes() % 5) * 60 - now.getSeconds()) * 1000;
   
-  setTimeout(updateSolarData, delay);
+  setTimeout(updateSolarData, delaySolar);
+  setTimeout(updateElectricityData, delayElectricity);
   
   printTimeUntilNextHour();
+  printTimeUntilNextFiveMinutes();
 
 document.body.classList.add("light");
 

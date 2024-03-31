@@ -30,4 +30,9 @@ class Location extends Model
   {
     return $this->hasMany(SolarPanel::class);
   }
+
+  public function electricityUsages()
+  {
+    return $this->hasMany(ElectricityUsage::class);
+  }
 }
