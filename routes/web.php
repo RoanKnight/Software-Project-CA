@@ -3,6 +3,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\SolarPanelController;
 use App\Http\Controllers\ElectricityUsageController;
 use App\Http\Controllers\ChargingStationController;
+use App\Http\Controllers\CarChargingController;
 use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\LocationController;
 use Illuminate\Support\Facades\Route;
@@ -36,6 +37,7 @@ Route::prefix('users')->group(function () {
 
 Route::prefix('locations')->group(function () {
   Route::get('/', [LocationController::class, 'index'])->name('locations.index');
+  Route::get('/user-locations', [LocationController::class, 'userLocations'])->name('locations.userLocations');
   Route::get('/create', [LocationController::class, 'create'])->name('locations.create');
   Route::post('/', [LocationController::class, 'store'])->name('locations.store');
   Route::get('/{location}', [LocationController::class, 'show'])->name('locations.show');
@@ -70,6 +72,12 @@ Route::prefix('chargingStations')->group(function () {
   Route::get('/{chargingStation}', [ChargingStationController::class, 'show'])->name('chargingStations.show');
   Route::delete('/{chargingStation}', [ChargingStationController::class, 'destroy'])->name('chargingStations.destroy');
   Route::patch('/{chargingStation}/restore', [ChargingStationController::class, 'restore'])->name('chargingStations.restore');
+});
+
+Route::prefix('carCharging')->group(function () {
+  Route::get('/', [CarChargingController::class, 'index'])->name('carCharging.index');
+  Route::post('/', [CarChargingController::class, 'store'])->name('carCharging.store');
+  Route::get('/{id}', [CarChargingController::class, 'show'])->name('carCharging.show');
 });
 
 require __DIR__ . '/auth.php';

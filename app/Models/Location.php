@@ -28,11 +28,16 @@ class Location extends Model
 
   public function solarPanels()
   {
-    return $this->hasMany(SolarPanel::class);
+    return $this->hasMany(SolarPanel::class, 'location_MPRN', 'MPRN');
   }
 
   public function electricityUsages()
   {
-    return $this->hasMany(ElectricityUsage::class);
+    return $this->hasMany(ElectricityUsage::class, 'location_MPRN', 'MPRN');
+  }
+
+  public function carChargings()
+  {
+    return $this->hasMany(CarCharging::class, 'location_MPRN', 'MPRN');
   }
 }

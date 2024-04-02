@@ -14,7 +14,10 @@ return new class extends Migration
         Schema::create('electricity_usages', function (Blueprint $table) {
             $table->id();
             $table->timestamps();
-            $table->foreignId('location_id');
+            $table->string('location_MPRN');
+
+            $table->foreign('location_MPRN')->references('MPRN')->on('locations');
+            
             $table->boolean('deleted')->default(false);
         });
     }

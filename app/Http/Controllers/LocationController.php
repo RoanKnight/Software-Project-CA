@@ -23,55 +23,67 @@ class LocationController extends Controller
     ]);
   }
 
+  public function userLocations()
+  {
+    $userLocations = auth()->user()->locations;
+    return view('locations.user-locations', [
+      'user_locations' => $userLocations
+    ]);
+  }
+
   public function create()
   {
     return view('locations.create');
   }
 
   public function store(Request $request)
-{
-  $request->merge(['EirCode' => str_replace(' ', '', $request->EirCode)]);
+  {
+    $request->merge(['EirCode' => str_replace(' ', '', $request->EirCode)]);
 
-  $rules = [
-    'MPRN' => 'required|digits:11|unique:locations,MPRN',
-    'address' => 'required|string|max:255',
-    'EirCode' => ['required', 'string', 'size:7', 'regex:/^[A-Z0-9]+$/',
-      function ($attribute, $value, $fail) {
-        if (Location::where('EirCode', $value)->where('user_id', Auth::id())->exists()) {
-          $fail('You cannot create another location with the same EirCode.');
-        }
-      },
-    ],
-  ];
+    $rules = [
+      'MPRN' => 'required|digits:11|unique:locations,MPRN',
+      'address' => 'required|string|max:255',
+      'EirCode' => [
+        'required',
+        'string',
+        'size:7',
+        'regex:/^[A-Z0-9]+$/',
+        function ($attribute, $value, $fail) {
+          if (Location::where('EirCode', $value)->where('user_id', Auth::id())->exists()) {
+            $fail('You cannot create another location with the same EirCode.');
+          }
+        },
+      ],
+    ];
 
-  $messages = [
-    'MPRN.required' => 'The MPRN field is required.',
-    'MPRN.digits' => 'The MPRN field must be exactly 11 digits.',
-    'MPRN.unique' => 'The MPRN field must be unique.',
-    'address.required' => 'The address field is required.',
-    'address.max' => 'The address field may not be greater than 255 characters.',
-    'EirCode.required' => 'The EirCode field is required.',
-    'EirCode.size' => 'The EirCode field must be exactly 7 characters.',
-    'EirCode.regex' => 'The EirCode field must be in the correct format. eg: D02AB12',
-  ];
+    $messages = [
+      'MPRN.required' => 'The MPRN field is required.',
+      'MPRN.digits' => 'The MPRN field must be exactly 11 digits.',
+      'MPRN.unique' => 'The MPRN field must be unique.',
+      'address.required' => 'The address field is required.',
+      'address.max' => 'The address field may not be greater than 255 characters.',
+      'EirCode.required' => 'The EirCode field is required.',
+      'EirCode.size' => 'The EirCode field must be exactly 7 characters.',
+      'EirCode.regex' => 'The EirCode field must be in the correct format. eg: D02AB12',
+    ];
 
-  $request->validate($rules, $messages);
+    $request->validate($rules, $messages);
 
-  $location = new Location;
-  $location->MPRN = $request->MPRN;
-  $location->address = $request->address;
-  $location->EirCode = $request->EirCode;
-  $location->user_id = Auth::id();
-  $location->save();
+    $location = new Location;
+    $location->MPRN = $request->MPRN;
+    $location->address = $request->address;
+    $location->EirCode = $request->EirCode;
+    $location->user_id = Auth::id();
+    $location->save();
 
-  $userDirectory = 'users/' . Auth::user()->email;
-  $locationDirectory = $userDirectory . '/' . str_replace(' ', '_', $location->address);
-  if (!Storage::exists($locationDirectory)) {
+    $userDirectory = 'users/' . Auth::user()->email;
+    $locationDirectory = $userDirectory . '/' . str_replace(' ', '_', $location->address);
+    if (!Storage::exists($locationDirectory)) {
       Storage::makeDirectory($locationDirectory);
-  }
+    }
 
-  return redirect()->route('locations.index')->with('status', 'Created a new location');
-}
+    return redirect()->route('locations.index')->with('status', 'Created a new location');
+  }
 
   public function show(string $id)
   {

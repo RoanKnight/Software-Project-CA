@@ -16,6 +16,6 @@ class ElectricityUsage extends Model
 
   public function location()
   {
-    return $this->belongsTo(Location::class, 'location_id', 'MPRN');
+    return $this->belongsTo(Location::class, 'location_MPRN', 'MPRN');
   }
 }

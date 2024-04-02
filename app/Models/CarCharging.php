@@ -7,5 +7,18 @@ use Illuminate\Database\Eloquent\Model;
 
 class CarCharging extends Model
 {
-    use HasFactory;
+  use HasFactory;
+
+  protected $fillable = [
+    'start_time',
+    'end_time',
+    'charging_amount',
+    'location_MPRN',
+    'is_active'
+  ];
+
+  public function location()
+  {
+    return $this->belongsTo(Location::class, 'location_MPRN', 'MPRN');
+  }
 }
