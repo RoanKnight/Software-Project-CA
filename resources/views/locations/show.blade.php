@@ -42,7 +42,7 @@
               {{ $location->EirCode }}
             </td>
             <td class="px-6 py-4">
-              @if ($location->deleted)
+              @if ($location->deleted || $location->user->deleted)
                 <span class="text-red-500">True</span>
               @else
                 <span class="text-green-500">False</span>
@@ -52,7 +52,7 @@
         </tbody>
       </table>
     </div>
-    @if ($location->deleted)
+    @if ($location->deleted || $location->user->deleted)
       <form method="POST" action="{{ route('locations.restore', $location->MPRN) }}">
         @csrf
         @method('PATCH')

@@ -50,11 +50,12 @@ class ElectricityUsageController extends Controller
     $request->validate($rules, $messages);
 
     $electricityUsage = new ElectricityUsage;
-    $electricityUsage->location_id = $request->location_id;
+    $electricityUsage->location_MPRN = $request->location_id;
     $electricityUsage->save();
 
     $location = Location::where('MPRN', $request->location_id)->first();
-    $locationDirectory = 'users/' . Auth::user()->email . '/' . $location->address;
+    $address = str_replace(' ', '_', $location->address);
+    $locationDirectory = 'users/' . Auth::user()->email . '/' . $address;
 
     if (!Storage::exists($locationDirectory)) {
       return redirect()->back()->with('error', 'Location directory does not exist');
@@ -74,7 +75,8 @@ class ElectricityUsageController extends Controller
       $locations = Location::where('user_id', $user->id)->get();
 
       foreach ($locations as $location) {
-        $path = 'users/' . $user->email . '/' . $location->address . '/electricity.json';
+        $address = str_replace(' ', '_', $location->address);
+        $path = 'users/' . $user->email . '/' . $address . '/electricity.json';
         if (!Storage::exists($path)) {
           continue;
         }
@@ -111,7 +113,7 @@ class ElectricityUsageController extends Controller
 
           $dateEntry['hours'][] = [
             'hour' => sprintf('%02d:%02d', $nextHour, $nextMinute),
-            'energyUsage_kwh' => rand(200, 500) / 10.0,
+            'energyUsage_kwh' => rand(10, 20) / 600,
           ];
 
           Storage::put($path, json_encode($data, JSON_PRETTY_PRINT));

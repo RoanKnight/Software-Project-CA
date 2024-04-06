@@ -31,7 +31,7 @@ class SolarPanelController extends Controller
 
   public function create()
   {
-    $locations = Location::all();
+    $locations = Location::where('user_id', auth()->id())->get();
     return view('solar.create', [
       'locations' => $locations,
     ]);
@@ -50,11 +50,12 @@ class SolarPanelController extends Controller
     $request->validate($rules, $messages);
 
     $solarPanel = new SolarPanel;
-    $solarPanel->location_id = $request->location_id;
+    $solarPanel->location_MPRN = $request->location_id;
     $solarPanel->save();
 
     $location = Location::where('MPRN', $request->location_id)->first();
-    $locationDirectory = 'users/' . Auth::user()->email . '/' . $location->address;
+    $address = str_replace(' ', '_', $location->address);
+    $locationDirectory = 'users/' . Auth::user()->email . '/' . $address;
 
     if (!Storage::exists($locationDirectory)) {
       return redirect()->back()->with('error', 'Location directory does not exist');
@@ -74,7 +75,8 @@ class SolarPanelController extends Controller
       $locations = Location::where('user_id', $user->id)->get();
 
       foreach ($locations as $location) {
-        $path = 'users/' . $user->email . '/' . $location->address . '/solar.json';
+        $address = str_replace(' ', '_', $location->address);
+        $path = 'users/' . $user->email . '/' . $address . '/solar.json';
         if (!Storage::exists($path)) {
           continue;
         }
@@ -108,7 +110,7 @@ class SolarPanelController extends Controller
         $nextHour = $lastHourEntry && isset($lastHourEntry['hour']) ? ((int) substr($lastHourEntry['hour'], 0, 2) + 1) % 24 : 0;
         $dateEntry['hours'][] = [
           'hour' => sprintf('%02d:00', $nextHour),
-          'energyGeneration_kwh' => rand(200, 500) / 10.0,
+          'energyGeneration_kwh' => rand(10, 20) / 10.0,
         ];
 
         Storage::put($path, json_encode($data, JSON_PRETTY_PRINT));

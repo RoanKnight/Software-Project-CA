@@ -13,8 +13,7 @@ class CarCharging extends Model
     'start_time',
     'end_time',
     'charging_amount',
-    'location_MPRN',
-    'is_active'
+    'location_MPRN'
   ];
 
   public function location()

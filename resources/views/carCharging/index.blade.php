@@ -43,6 +43,9 @@
                 Charging Amount (kwh)
               </th>
               <th scope="col" class="px-6 py-3 text-tableHeadingText">
+                Deleted
+              </th>
+              <th scope="col" class="px-6 py-3 text-tableHeadingText">
                 Action
               </th>
             </tr>
@@ -63,9 +66,18 @@
               <td class="px-6 py-4 text-tableRowText">
                 {{ $carCharging->charging_amount }}
               </td>
+              <td class="px-6 py-4 text-tableRowText">
+                <!-- Display 'True' if deleted, 'False' otherwise -->
+                @if ($carCharging->deleted || $carCharging->location->deleted || $carCharging->location->user->deleted)
+                  <span class="text-red-500">True</span>
+                @else
+                  <span class="text-green-500">False</span>
+                @endif
+              </td>
               <td class="px-6 py-4">
                 <!-- Link to the show page for the car charging -->
-                <a href="{{ route('carCharging.show', $carCharging->id) }}" class="text-blue-500 hover:text-blue-700 underline">View</a>
+                <a href="{{ route('carCharging.show', $carCharging->id) }}"
+                  class="text-blue-500 hover:text-blue-700 underline">View</a>
               </td>
             </tr>
           @empty

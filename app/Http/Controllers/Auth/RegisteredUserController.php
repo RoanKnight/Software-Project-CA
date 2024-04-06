@@ -86,7 +86,6 @@ class RegisteredUserController extends Controller
   public function destroy(string $id)
   {
     $user = User::findOrFail($id);
-
     $user->update(['deleted' => true]);
 
     return redirect()->route('users.index')->with('status', 'User deleted successfully');

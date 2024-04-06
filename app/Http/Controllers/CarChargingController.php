@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\CarCharging;
+use App\Models\Location;
 use App\Models\User;
 
 class CarChargingController extends Controller
@@ -17,36 +18,43 @@ class CarChargingController extends Controller
   public function index()
   {
     $carChargings = CarCharging::all();
+    $locations = Location::all();
     return view('carCharging.index', [
-      'carChargings' => $carChargings
+      'carChargings' => $carChargings,
+      'locations' => $locations
+    ]);
+  }
+
+  public function LocationsCarChargings()
+  {
+    $locationCarChargings = auth()->user()->locations;
+    return view('carCharging.location_carChargings', [
+      'location_car_charging' => $locationCarChargings
     ]);
   }
 
   public function store(Request $request)
   {
-    $users = User::with('locations')->get();
+    $user = auth()->user();
+    $activeLocation = $user->locations()->where('MPRN', session('active_location_MPRN'))->first();
 
-    foreach ($users as $user) {
-      foreach ($user->locations as $location) {
-        if ($location->deleted) {
-          continue;
-        }
+    if ($activeLocation && !$activeLocation->deleted) {
+      $chargingRatePerMinute = rand(7, 11) / 60;
 
-        $chargingRatePerMinute = rand(7, 11) / 60;
+      $carCharging = new CarCharging;
+      $carCharging->start_time = now();
+      $carCharging->end_time = now()->addMinutes(rand(10, 120));
+      $carCharging->location_MPRN = $activeLocation->MPRN;
 
-        $carCharging = new CarCharging;
-        $carCharging->start_time = now();
-        $carCharging->end_time = now()->addMinutes(rand(10, 120));
-        $carCharging->location_MPRN = $location->MPRN;
+      $chargingTimeInMinutes = $carCharging->start_time->diffInMinutes($carCharging->end_time, true);
+      $carCharging->charging_amount = $chargingTimeInMinutes * $chargingRatePerMinute;
 
-        $chargingTimeInMinutes = $carCharging->start_time->diffInMinutes($carCharging->end_time, true);
-        $carCharging->charging_amount = $chargingTimeInMinutes * $chargingRatePerMinute;
+      $carCharging->save();
 
-        $carCharging->save();
-      }
+      return redirect()->route('carCharging.index')->with('status', 'Created a new charging station for active location');
     }
 
-    return redirect()->route('carCharging.index')->with('status', 'Created a new charging station');
+    return redirect()->route('carCharging.index')->with('status', 'Failed to create charging station for active location');
   }
 
   public function show(string $id)

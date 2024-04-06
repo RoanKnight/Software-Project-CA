@@ -56,7 +56,7 @@
               </td>
               <td class="px-6 py-4 text-tableRowText">
                 <!-- Display 'True' if deleted, 'False' otherwise -->
-                @if ($solarPanel->deleted)
+                @if ($solarPanel->deleted || $solarPanel->location->deleted || $solarPanel->location->user->deleted)
                   <span class="text-red-500">True</span>
                 @else
                   <span class="text-green-500">False</span>

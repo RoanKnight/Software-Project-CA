@@ -40,6 +40,7 @@ Route::prefix('locations')->group(function () {
   Route::get('/user-locations', [LocationController::class, 'userLocations'])->name('locations.userLocations');
   Route::get('/create', [LocationController::class, 'create'])->name('locations.create');
   Route::post('/', [LocationController::class, 'store'])->name('locations.store');
+  Route::post('/{MPRN}/setActiveLocation', [LocationController::class, 'setActiveLocation'])->name('setActiveLocation');
   Route::get('/{location}', [LocationController::class, 'show'])->name('locations.show');
   Route::delete('/{location}', [LocationController::class, 'destroy'])->name('locations.destroy');
   Route::patch('/{MPRN}/restore', [LocationController::class, 'restore'])->name('locations.restore');
@@ -76,6 +77,7 @@ Route::prefix('chargingStations')->group(function () {
 
 Route::prefix('carCharging')->group(function () {
   Route::get('/', [CarChargingController::class, 'index'])->name('carCharging.index');
+  Route::get('/location-car-charging', [CarChargingController::class, 'LocationsCarChargings'])->name('carCharging.locationCarCharging');
   Route::post('/', [CarChargingController::class, 'store'])->name('carCharging.store');
   Route::get('/{id}', [CarChargingController::class, 'show'])->name('carCharging.show');
 });

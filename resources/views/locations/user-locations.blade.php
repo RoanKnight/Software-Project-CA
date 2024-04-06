@@ -39,11 +39,38 @@
               <th scope="col" class="px-6 py-3 text-tableHeadingText">
                 EirCode
               </th>
+              <th scope="col" class="px-6 py-3 text-tableHeadingText">
+                Active
+              </th>
+              <th scope="col" class="px-6 py-3 text-tableHeadingText">
+                Action
+              </th>
+              <th scope="col" class="px-6 py-3 text-tableHeadingText">
+                View
+              </th>
             </tr>
           </thead>
 
+          @php
+            $locations = auth()
+                ->user()
+                ->locations->filter(function ($location) {
+                    return !$location->deleted;
+                });
+          @endphp
+
           <!-- Table Body -->
-          @forelse(auth()->user()->locations as $location)
+
+          @php
+            $locations = auth()
+                ->user()
+                ->locations->filter(function ($location) {
+                    return !$location->deleted;
+                });
+          @endphp
+
+          <!-- Table Body -->
+          @forelse($locations as $location)
             <tr class="bg-tableRowBG">
               <td scope="row" class="px-6 py-4 font-bold text-tableRowText whitespace-nowrap">
                 {{ $location->MPRN }}
@@ -54,6 +81,19 @@
               <td class="px-6 py-4 text-tableRowText">
                 {{ $location->EirCode }}
               </td>
+              <td class="px-6 py-4 text-tableRowText">
+                {{ session('active_location_MPRN') == $location->MPRN ? 'Yes' : 'No' }}
+              </td>
+              <td class="px-6 py-4 text-tableRowText">
+                @if (session('active_location_MPRN') != $location->MPRN)
+                  <form method="POST" action="{{ route('setActiveLocation', $location->MPRN) }}">
+                    @csrf
+                    <button type="submit">Make Active</button>
+                  </form>
+                @endif
+              </td>
+              <td class="px-6 py-4  text-tableRowText">
+                <a class="text-blue-500 hover:text-blue-700 underline" href="{{ route('locations.show', $location->MPRN) }}">View</a>
             </tr>
           @empty
             <!-- Displayed when no locations are found -->

@@ -16,7 +16,6 @@ return new class extends Migration {
       $table->timestamp('end_time');
       $table->decimal('charging_amount', 8, 2);
       $table->string('location_MPRN');
-      $table->boolean('is_active')->default(false);
       $table->timestamps();
     });
   }

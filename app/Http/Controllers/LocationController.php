@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Models\User;
 use App\Models\Location;
 use Illuminate\Support\Facades\Storage;
 use Auth;
@@ -17,15 +18,22 @@ class LocationController extends Controller
 
   public function index()
   {
+    $users = User::all();
     $locations = Location::all();
     return view('locations.index', [
       'locations' => $locations,
+      'users' => $users
     ]);
   }
 
   public function userLocations()
   {
     $userLocations = auth()->user()->locations;
+
+    if (!session('active_location_MPRN') && $userLocations->isNotEmpty()) {
+      session(['active_location_MPRN' => $userLocations->first()->MPRN]);
+    }
+
     return view('locations.user-locations', [
       'user_locations' => $userLocations
     ]);
@@ -82,7 +90,32 @@ class LocationController extends Controller
       Storage::makeDirectory($locationDirectory);
     }
 
+    if (!session('active_location_MPRN')) {
+      session(['active_location_MPRN' => $location->MPRN]);
+    }
+
+    $activeLocation = Location::where('MPRN', session('active_location_MPRN'))->first();
+    if ($activeLocation && $activeLocation->deleted) {
+        session(['active_location_MPRN' => $location->MPRN]);
+    }
+
+    if (Location::where('user_id', Auth::id())->count() == 1) {
+      session(['active_location_MPRN' => $location->MPRN]);
+    }
+
     return redirect()->route('locations.index')->with('status', 'Created a new location');
+  }
+
+  public function setActiveLocation($MPRN)
+  {
+    $user = auth()->user();
+    $location = Location::where('MPRN', $MPRN)->first();
+
+    if ($location && $user->locations->contains($location)) {
+      session(['active_location_MPRN' => $MPRN]);
+    }
+
+    return back();
   }
 
   public function show(string $id)

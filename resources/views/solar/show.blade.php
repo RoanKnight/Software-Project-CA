@@ -36,7 +36,7 @@
               {{ $solarPanel->location->address }}
             </td>
             <td class="px-6 py-4">
-              @if ($solarPanel->deleted)
+              @if ($solarPanel->deleted || $solarPanel->location->deleted || $solarPanel->location->user->deleted)
                 <span class="text-red-500">True</span>
               @else
                 <span class="text-green-500">False</span>
@@ -46,7 +46,7 @@
         </tbody>
       </table>
     </div>
-    @if ($solarPanel->deleted)
+    @if ($solarPanel->deleted || $solarPanel->location->deleted || $solarPanel->location->user->deleted)
       <form method="POST" action="{{ route('solar.restore', $solarPanel->id) }}">
         @csrf
         @method('PATCH')
