@@ -51,6 +51,8 @@ Route::prefix('solar')->group(function () {
   Route::get('/create', [SolarPanelController::class, 'create'])->name('solar.create');
   Route::post('/', [SolarPanelController::class, 'store'])->name('solar.store');
   Route::get('/update-solar-data', [SolarPanelController::class, 'updateSolarData'])->name('solar.updateSolarData');
+  Route::get('/get-solar-data', [SolarPanelController::class, 'getSolarData'])->name('solar.getSolarData');
+  Route::get('/dashboard', [SolarPanelController::class, 'dashboard'])->name('solar.dashboard');
   Route::get('/{solarPanel}', [SolarPanelController::class, 'show'])->name('solar.show');
   Route::delete('/{solarPanel}', [SolarPanelController::class, 'destroy'])->name('solar.destroy');
   Route::patch('/{solarPanel}/restore', [SolarPanelController::class, 'restore'])->name('solar.restore');
@@ -61,6 +63,7 @@ Route::prefix('electricity')->group(function () {
   Route::get('/create', [ElectricityUsageController::class, 'create'])->name('electricity.create');
   Route::post('/', [ElectricityUsageController::class, 'store'])->name('electricity.store');
   Route::get('/update-electricity-data', [ElectricityUsageController::class, 'updateElectricityData'])->name('electricity.updateElectricityData');
+  Route::get('/dashboard', [ElectricityUsageController::class, 'dashboard'])->name('electricity.dashboard');
   Route::get('/{electricityUsage}', [ElectricityUsageController::class, 'show'])->name('electricity.show');
   Route::delete('/{electricityUsage}', [ElectricityUsageController::class, 'destroy'])->name('electricity.destroy');
   Route::patch('/{electricityUsage}/restore', [ElectricityUsageController::class, 'restore'])->name('electricity.restore');
@@ -70,6 +73,7 @@ Route::prefix('chargingStations')->group(function () {
   Route::get('/', [ChargingStationController::class, 'index'])->name('chargingStations.index');
   Route::get('/create', [ChargingStationController::class, 'create'])->name('chargingStations.create');
   Route::post('/', [ChargingStationController::class, 'store'])->name('chargingStations.store');
+  Route::get('/dashboard', [ChargingStationController::class, 'dashboard'])->name('chargingStations.dashboard');
   Route::get('/{chargingStation}', [ChargingStationController::class, 'show'])->name('chargingStations.show');
   Route::delete('/{chargingStation}', [ChargingStationController::class, 'destroy'])->name('chargingStations.destroy');
   Route::patch('/{chargingStation}/restore', [ChargingStationController::class, 'restore'])->name('chargingStations.restore');
@@ -79,6 +83,7 @@ Route::prefix('carCharging')->group(function () {
   Route::get('/', [CarChargingController::class, 'index'])->name('carCharging.index');
   Route::get('/location-car-charging', [CarChargingController::class, 'LocationsCarChargings'])->name('carCharging.locationCarCharging');
   Route::post('/', [CarChargingController::class, 'store'])->name('carCharging.store');
+  Route::get('/dashboard', [CarChargingController::class, 'dashboard'])->name('carCharging.dashboard');
   Route::get('/{id}', [CarChargingController::class, 'show'])->name('carCharging.show');
 });
 

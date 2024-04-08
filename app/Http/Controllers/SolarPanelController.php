@@ -8,15 +8,18 @@ use App\Models\Location;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Storage;
+use App\Services\WeatherService;
 use Auth;
 
 class SolarPanelController extends Controller
 {
+  protected $weatherService;
 
-  public function __construct()
+  public function __construct(WeatherService $weatherService)
   {
     $this->middleware('auth', ['except' => []]);
     $this->middleware('role:admin', ['only' => ['delete', 'restore', 'index']]);
+    $this->weatherService = $weatherService;
   }
 
   public function index()
@@ -25,7 +28,7 @@ class SolarPanelController extends Controller
     $locations = Location::all();
     return view('solar.index', [
       'solarPanels' => $solarPanels,
-      'locations' => $locations
+      'locations' => $locations,
     ]);
   }
 
@@ -44,12 +47,12 @@ class SolarPanelController extends Controller
     ];
 
     $messages = [
-      'location_id.required' => 'The location field is required.'
+      'location_id.required' => 'The location field is required.',
     ];
 
     $request->validate($rules, $messages);
 
-    $solarPanel = new SolarPanel;
+    $solarPanel = new SolarPanel();
     $solarPanel->location_MPRN = $request->location_id;
     $solarPanel->save();
 
@@ -70,6 +73,12 @@ class SolarPanelController extends Controller
   public function updateSolarData()
   {
     $users = User::all();
+    $location = 'Dún Laoghaire, IE'; // Same location as in the dashboard method
+
+    // Fetch sunrise and sunset times
+    $weather = $this->weatherService->getCurrentWeather($location);
+    $sunriseHour = date('H', $weather['sys']['sunrise']);
+    $sunsetHour = date('H', $weather['sys']['sunset']);
 
     foreach ($users as $user) {
       $locations = Location::where('user_id', $user->id)->get();
@@ -95,7 +104,7 @@ class SolarPanelController extends Controller
         if ($dateEntry === null) {
           $dateEntry = [
             'date' => $currentDate,
-            'hours' => []
+            'hours' => [],
           ];
           $data[] = &$dateEntry;
           Storage::put($path, json_encode($data, JSON_PRETTY_PRINT));
@@ -108,9 +117,12 @@ class SolarPanelController extends Controller
         }
 
         $nextHour = $lastHourEntry && isset($lastHourEntry['hour']) ? ((int) substr($lastHourEntry['hour'], 0, 2) + 1) % 24 : 0;
+
+        $energyGeneration = $nextHour >= $sunriseHour && $nextHour < $sunsetHour ? rand(10, 20) / 10.0 : 0;
+
         $dateEntry['hours'][] = [
           'hour' => sprintf('%02d:00', $nextHour),
-          'energyGeneration_kwh' => rand(10, 20) / 10.0,
+          'energyGeneration_kwh' => $energyGeneration,
         ];
 
         Storage::put($path, json_encode($data, JSON_PRETTY_PRINT));
@@ -120,12 +132,71 @@ class SolarPanelController extends Controller
     return response()->json('Solar data updated for all users and locations');
   }
 
+  public function getSolarData()
+  {
+    // Fetch the active location MPRN from the session
+    $activeLocationMPRN = session('active_location_MPRN');
+
+    // Find the location with the active MPRN
+    $location = Location::where('MPRN', $activeLocationMPRN)->first();
+
+    if (!$location) {
+      return response()->json(['error' => 'No active location found.'], 404);
+    }
+
+    $address = str_replace(' ', '_', $location->address);
+    $filePath = 'users/' . $location->user->email . '/' . $address . '/solar.json';
+
+    if (Storage::exists($filePath)) {
+      $data = Storage::get($filePath);
+
+      $jsonData = json_decode($data, true);
+
+      $energyGenerationValues = [];
+
+      foreach ($jsonData as $dateData) {
+        $dateEnergyGenerationValues = array_map(function ($hour) {
+          return [
+            'hour' => $hour['hour'],
+            'energyGeneration_kwh' => $hour['energyGeneration_kwh'],
+          ];
+        }, $dateData['hours']);
+
+        $energyGenerationValues[] = [
+          'date' => $dateData['date'],
+          'hours' => $dateEnergyGenerationValues,
+        ];
+      }
+
+      return response()->json($energyGenerationValues);
+    } else {
+      return response()->json(['error' => 'File does not exist.'], 404);
+    }
+  }
+
+  public function dashboard()
+  {
+    $user = auth()->user();
+    $locations = Location::where('user_id', auth()->id())->get();
+    $solarPanels = SolarPanel::whereIn('location_MPRN', $locations->pluck('MPRN'))->get();
+
+    $location = 'Dún Laoghaire, IE';
+    $weather = $this->weatherService->getCurrentWeather($location);
+
+    return view('solar.dashboard', [
+      'user' => $user,
+      'solarPanels' => $solarPanels,
+      'locations' => $locations,
+      'weather' => $weather,
+    ]);
+  }
+
   public function show(string $id)
   {
     $solarPanel = SolarPanel::findOrFail($id);
 
     return view('solar.show', [
-      'solarPanel' => $solarPanel
+      'solarPanel' => $solarPanel,
     ]);
   }
 

@@ -122,6 +122,19 @@ class ElectricityUsageController extends Controller
     }
   }
 
+  public function dashboard()
+  {
+    $user = auth()->user();
+    $locations = Location::where('user_id', auth()->id())->get();
+    $electricityUsage = ElectricityUsage::whereIn('location_MPRN', $locations->pluck('MPRN'))->get();
+
+    return view('electricity.dashboard', [
+      'user' => $user,
+      'electricityUsage' => $electricityUsage,
+      'locations' => $locations,
+    ]);
+  }
+
   public function show(string $id)
   {
     $electricityUsage = ElectricityUsage::findOrFail($id);

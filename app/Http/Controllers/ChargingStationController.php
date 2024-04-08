@@ -54,6 +54,15 @@ class ChargingStationController extends Controller
     return redirect()->route('chargingStations.index')->with('status', 'Created a new charging station');
   }
 
+  public function dashboard()
+  {
+    $chargingStation = ChargingStation::all();
+
+    return view('chargingStations.dashboard', [
+      'chargingStation' => $chargingStation
+    ]);
+  }
+
   public function show(string $id)
   {
     $chargingStation = ChargingStation::findOrFail($id);

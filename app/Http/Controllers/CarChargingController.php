@@ -57,6 +57,19 @@ class CarChargingController extends Controller
     return redirect()->route('carCharging.index')->with('status', 'Failed to create charging station for active location');
   }
 
+  public function dashboard()
+  {
+    $user = auth()->user();
+    $locations = Location::where('user_id', auth()->id())->get();
+    $carCharging = CarCharging::whereIn('location_MPRN', $locations->pluck('MPRN'))->get();
+
+    return view('carCharging.dashboard', [
+      'user' => $user,
+      'carCharging' => $carCharging,
+      'locations' => $locations,
+    ]);
+  }
+
   public function show(string $id)
   {
   }
