@@ -11,7 +11,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     localStorage.setItem('selectedValue', selectedValue);
 
-    if (selectedValue !== 'hourly') {
+    if (selectedValue !== 'Daily') {
       document.querySelector('.totalEnergy').textContent = '';
       document.querySelector('.previousTotal').textContent = '';
       document.querySelector('.averageEnergy').textContent = '';
@@ -57,55 +57,54 @@ document.addEventListener("DOMContentLoaded", function () {
         .then(response => response.json())
         .then(data => {
           const today = new Date();
-          const yesterday = new Date(today);
-          yesterday.setDate(today.getDate() - 1);
+          const lastWeek = new Date(today);
+          lastWeek.setDate(today.getDate() - 7);
 
           const ddToday = String(today.getDate()).padStart(2, '0');
           const mmToday = String(today.getMonth() + 1).padStart(2, '0');
           const yyyyToday = today.getFullYear();
 
-          const ddYesterday = String(yesterday.getDate()).padStart(2, '0');
-          const mmYesterday = String(yesterday.getMonth() + 1).padStart(2, '0');
-          const yyyyYesterday = yesterday.getFullYear();
+          const ddLastWeek = String(lastWeek.getDate()).padStart(2, '0');
+          const mmLastWeek = String(lastWeek.getMonth() + 1).padStart(2, '0');
+          const yyyyLastWeek = lastWeek.getFullYear();
 
           const todayStr = ddToday + '-' + mmToday + '-' + yyyyToday;
-          const yesterdayStr = ddYesterday + '-' + mmYesterday + '-' + yyyyYesterday;
+          const lastWeekStr = ddLastWeek + '-' + mmLastWeek + '-' + yyyyLastWeek;
 
-          const todayData = data.find(item => item.date === todayStr);
-          const yesterdayData = data.find(item => item.date === yesterdayStr);
+          const weekData = data.filter(item => new Date(item.date) >= lastWeek && new Date(item.date) <= today);
+          const lastWeekData = data.filter(item => new Date(item.date) < lastWeek && new Date(item.date) >= new Date(lastWeek.setDate(lastWeek.getDate() - 7)));
 
-          if (todayData) {
-            const hours = todayData.hours.filter(item => item.energyGeneration_kwh > 0).map(item => item.hour);
-            const energyGenerationValues = todayData.hours.filter(item => item.energyGeneration_kwh > 0).map(item =>
-              item.energyGeneration_kwh);
+          if (weekData.length > 0) {
+            const days = weekData.map(item => item.date);
+            const energyGenerationValues = weekData.map(item => item.hours.reduce((total, hour) => total + hour.energyGeneration_kwh, 0));
             const totalEnergy = energyGenerationValues.reduce((total, energy) => total + energy, 0);
             document.querySelector('.totalEnergy').textContent = totalEnergy.toFixed(2) + " kWh";
             const averageEnergy = totalEnergy / energyGenerationValues.length;
             document.querySelector('.averageEnergy').textContent = `${averageEnergy.toFixed(2)} kWh`;
 
-            if (yesterdayData) {
-              const yesterdayEnergyGenerationValues = yesterdayData.hours.map(item => item.energyGeneration_kwh);
-              const yesterdayTotalEnergy = yesterdayEnergyGenerationValues.reduce((total, energy) => total + energy, 0);
-              const yesterdayAverageEnergy = yesterdayTotalEnergy / yesterdayEnergyGenerationValues.length;
+            if (lastWeekData.length > 0) {
+              const lastWeekEnergyGenerationValues = lastWeekData.map(item => item.hours.reduce((total, hour) => total + hour.energyGeneration_kwh, 0));
+              const lastWeekTotalEnergy = lastWeekEnergyGenerationValues.reduce((total, energy) => total + energy, 0);
+              const lastWeekAverageEnergy = lastWeekTotalEnergy / lastWeekEnergyGenerationValues.length;
 
-              const totalDifference = totalEnergy - yesterdayTotalEnergy;
-              const averageDifference = averageEnergy - yesterdayAverageEnergy;
+              const totalDifference = totalEnergy - lastWeekTotalEnergy;
+              const averageDifference = averageEnergy - lastWeekAverageEnergy;
 
               const comparison = (totalDifference > 0 && averageDifference > 0) ? 'more' : 'less';
               const colorClass = comparison === 'more' ? 'text-green-500' : 'text-red-500';
 
               const totalDifferenceElement = `<span class="${colorClass}">${Math.abs(totalDifference.toFixed(2))} kWh</span>`;
-              document.querySelector('.previousTotal').innerHTML = `${totalDifferenceElement} ${comparison} than yesterday`;
+              document.querySelector('.previousTotal').innerHTML = `${totalDifferenceElement} ${comparison} than last week`;
 
               const averageDifferenceElement = `<span class="${colorClass}">${Math.abs(averageDifference.toFixed(2))} kWh</span>`;
-              document.querySelector('.averageComparison').innerHTML = `${averageDifferenceElement} ${comparison} than yesterday`;
+              document.querySelector('.averageComparison').innerHTML = `${averageDifferenceElement} ${comparison} than last week`;
             } else {
               document.querySelector('.previousTotal').textContent = '';
               document.querySelector('.averageComparison').textContent = '';
             }
 
             const x = d3.scaleBand()
-              .domain(hours)
+              .domain(days)
               .range([0, width]);
             g.append("g")
               .attr("transform", `translate(0, ${height})`)
@@ -115,7 +114,7 @@ document.addEventListener("DOMContentLoaded", function () {
               .attr('text-anchor', 'end')
               .attr('x', width / 2)
               .attr('y', height + margin.top + 40)
-              .text('Hours');
+              .text('Days');
 
             const y = d3.scaleLinear()
               .domain([0, d3.max(energyGenerationValues)])
@@ -132,7 +131,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
             const line = d3.line()
               .curve(d3.curveBasis)
-              .x((d, i) => x(hours[i]) + x.bandwidth() / 2)
+              .x((d, i) => x(days[i]) + x.bandwidth() / 2)
               .y(d => y(d));
 
             g.append("path")
@@ -142,7 +141,7 @@ document.addEventListener("DOMContentLoaded", function () {
               .attr("stroke-width", 1.5)
               .attr("d", line);
           } else {
-            console.log('No data for today');
+            console.log('No data for this week');
           }
         });
     }

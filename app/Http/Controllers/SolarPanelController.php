@@ -134,8 +134,8 @@ class SolarPanelController extends Controller
 
   public function getSolarData()
   {
-    // Fetch the active location MPRN from the session
-    $activeLocationMPRN = session('active_location_MPRN');
+    // Fetch the active location MPRN from the User model
+    $activeLocationMPRN = auth()->user()->active_MPRN;
 
     // Find the location with the active MPRN
     $location = Location::where('MPRN', $activeLocationMPRN)->first();

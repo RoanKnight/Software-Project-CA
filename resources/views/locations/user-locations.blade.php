@@ -82,10 +82,10 @@
                 {{ $location->EirCode }}
               </td>
               <td class="px-6 py-4 text-tableRowText">
-                {{ session('active_location_MPRN') == $location->MPRN ? 'Yes' : 'No' }}
+                {{ auth()->user()->active_MPRN == $location->MPRN ? 'Yes' : 'No' }}
               </td>
               <td class="px-6 py-4 text-tableRowText">
-                @if (session('active_location_MPRN') != $location->MPRN)
+                @if (auth()->user()->active_MPRN != $location->MPRN)
                   <form method="POST" action="{{ route('setActiveLocation', $location->MPRN) }}">
                     @csrf
                     <button type="submit">Make Active</button>
@@ -93,7 +93,8 @@
                 @endif
               </td>
               <td class="px-6 py-4  text-tableRowText">
-                <a class="text-blue-500 hover:text-blue-700 underline" href="{{ route('locations.show', $location->MPRN) }}">View</a>
+                <a class="text-blue-500 hover:text-blue-700 underline"
+                  href="{{ route('locations.show', $location->MPRN) }}">View</a>
             </tr>
           @empty
             <!-- Displayed when no locations are found -->

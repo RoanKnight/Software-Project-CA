@@ -24,7 +24,8 @@ class User extends Authenticatable
     'email',
     'password',
     'role',
-    'deleted'
+    'deleted',
+    'active_MPRN' // Add this line
   ];
 
   /**
@@ -50,6 +51,11 @@ class User extends Authenticatable
   public function locations()
   {
     return $this->hasMany(Location::class);
+  }
+
+  public function activeLocation()
+  {
+    return $this->hasOne(Location::class, 'MPRN', 'active_MPRN');
   }
 
   public function isAdmin()

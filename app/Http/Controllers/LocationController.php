@@ -30,8 +30,9 @@ class LocationController extends Controller
   {
     $userLocations = auth()->user()->locations;
 
-    if (!session('active_location_MPRN') && $userLocations->isNotEmpty()) {
-      session(['active_location_MPRN' => $userLocations->first()->MPRN]);
+    if (!auth()->user()->active_MPRN && $userLocations->isNotEmpty()) {
+      auth()->user()->active_MPRN = $userLocations->first()->MPRN;
+      auth()->user()->save();
     }
 
     return view('locations.user-locations', [
@@ -46,6 +47,7 @@ class LocationController extends Controller
 
   public function store(Request $request)
   {
+    $user = auth()->user();
     $request->merge(['EirCode' => str_replace(' ', '', $request->EirCode)]);
 
     $rules = [
@@ -90,17 +92,20 @@ class LocationController extends Controller
       Storage::makeDirectory($locationDirectory);
     }
 
-    if (!session('active_location_MPRN')) {
-      session(['active_location_MPRN' => $location->MPRN]);
+    if (!$user->active_MPRN) {
+      $user->active_MPRN = $location->MPRN;
+      $user->save();
     }
 
-    $activeLocation = Location::where('MPRN', session('active_location_MPRN'))->first();
+    $activeLocation = Location::where('MPRN', $user->active_MPRN)->first();
     if ($activeLocation && $activeLocation->deleted) {
-        session(['active_location_MPRN' => $location->MPRN]);
+      $user->active_MPRN = $location->MPRN;
+      $user->save();
     }
 
     if (Location::where('user_id', Auth::id())->count() == 1) {
-      session(['active_location_MPRN' => $location->MPRN]);
+      $user->active_MPRN = $location->MPRN;
+      $user->save();
     }
 
     return redirect()->route('locations.index')->with('status', 'Created a new location');
@@ -112,7 +117,8 @@ class LocationController extends Controller
     $location = Location::where('MPRN', $MPRN)->first();
 
     if ($location && $user->locations->contains($location)) {
-      session(['active_location_MPRN' => $MPRN]);
+      $user->active_MPRN = $MPRN;
+      $user->save();
     }
 
     return back();

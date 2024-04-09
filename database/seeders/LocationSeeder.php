@@ -39,6 +39,15 @@ class LocationSeeder extends Seeder
 
     Location::insert($locations);
 
+    $users = User::all();
+    foreach ($users as $user) {
+      $firstLocation = $user->locations()->first();
+      if ($firstLocation) {
+        $user->active_MPRN = $firstLocation->MPRN;
+        $user->save();
+      }
+    }
+
     foreach ($locations as $locationData) {
       $user = User::find($locationData['user_id']);
       $locationDirectory = 'users/' . $user->email . '/' . str_replace(' ', '_', $locationData['address']);
