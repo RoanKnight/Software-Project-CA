@@ -16,10 +16,7 @@
 
   @vite(resource_path('css/app.css'))
   @vite(resource_path('js/app.js'))
-  @vite('resources/js/solarCharts/Hourlycharts.js')
-  {{-- @vite('resources/js/solarCharts/Dailycharts.js') --}}
-  {{-- @vite('resources/js/solarCharts/Weeklycharts.js')
-  @vite('resources/js/solarCharts/Monthlycharts.js') --}}
+  @vite('resources//js/solarCharts/Allcharts.js')
 </head>
 
 <body class="font-sans bg-background">
