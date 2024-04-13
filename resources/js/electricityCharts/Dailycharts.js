@@ -40,46 +40,39 @@ export function dailyChart() {
   const g = svg.append("g")
     .attr("transform", `translate(${margin.left},${margin.top})`);
 
-  fetch('/solar/get-solar-data')
+  fetch('/electricity/get-electricity-data')
     .then(response => response.json())
     .then(data => {
       const today = new Date();
       const previousWeek = new Date(today);
-      previousWeek.setDate(today.getDate() - 14);
-      previousWeek.setHours(0, 0, 0, 0);
-
-      // Convert date from "DD-MM-YYYY" to "MM-DD-YYYY"
-      function convertDate(inputFormat) {
-        let parts = inputFormat.split('-');
-        return new Date(parts[2], parts[1] - 1, parts[0]);
-      }
+      previousWeek.setDate(today.getDate() - 6);
 
       // Filter out the data that is older than 6 days
-      const recentData = data.filter(item => convertDate(item.date) >= previousWeek);
+      const recentData = data.filter(item => new Date(item.date) >= previousWeek);
 
-      // For each day, sum up the energy generation of all hours
-      const dailyEnergyGeneration = recentData.map(item => {
-        const totalEnergy = item.hours.reduce((total, hour) => total + hour.energyGeneration_kwh, 0);
+      console.log(recentData);
+
+      // For each day, sum up the energy generation of all times
+      const dailyElectricityConsumption = recentData.map(item => {
+        const totalEnergy = item.times.reduce((total, time) => total + time.energyUsage_kwh, 0);
         return {
           date: item.date,
           totalEnergy
         };
       });
 
-      console.log(dailyEnergyGeneration);
-
-      const totalEnergy = dailyEnergyGeneration.reduce((total, item) => total + item.totalEnergy, 0);
+      const totalEnergy = dailyElectricityConsumption.reduce((total, item) => total + item.totalEnergy, 0);
       document.querySelector('.totalEnergy').textContent = totalEnergy.toFixed(2) + " kWh";
-      const averageEnergy = totalEnergy / dailyEnergyGeneration.length;
+      const averageEnergy = totalEnergy / dailyElectricityConsumption.length;
       document.querySelector('.averageEnergy').textContent = `${averageEnergy.toFixed(2)} kWh`;
 
-      if (dailyEnergyGeneration.length < 7) {
+      if (dailyElectricityConsumption.length < 7) {
         document.querySelector('.previousTotal').textContent = 'Not enough data for previous week comparison';
         document.querySelector('.averageComparison').textContent = 'Not enough data for previous week comparison';
       } else {
-        const currentWeekEnergy = dailyEnergyGeneration.slice(0, 7).reduce((total, item) => total + item.totalEnergy, 0).toFixed(2);
+        const currentWeekEnergy = dailyElectricityConsumption.slice(0, 7).reduce((total, item) => total + item.totalEnergy, 0).toFixed(2);
         console.log(currentWeekEnergy);
-        const previousWeekEnergy = dailyEnergyGeneration.slice(7, 14).reduce((total, item) => total + item.totalEnergy, 0).toFixed(2);
+        const previousWeekEnergy = dailyElectricityConsumption.slice(7, 14).reduce((total, item) => total + item.totalEnergy, 0).toFixed(2);
         console.log(previousWeekEnergy);
         const currentWeekAverage = currentWeekEnergy / 7;
         const previousWeekAverage = previousWeekEnergy / 7;
@@ -97,10 +90,9 @@ export function dailyChart() {
         document.querySelector('.averageComparison').innerHTML = `${averageDifferenceElement} ${comparison} than yesterday`;
       }
 
-
-      // Use the summed up values for the y-axis and the dates for the x-axis
-      const dates = dailyEnergyGeneration.map(item => item.date);
-      const energyGenerationValues = dailyEnergyGeneration.map(item => item.totalEnergy);
+      // Use the summed up values for the y-axis and get the dates for the x-axis
+      const dates = dailyElectricityConsumption.map(item => item.date);
+      const electricityConsumptionValues = dailyElectricityConsumption.map(item => item.totalEnergy);
 
       const x = d3.scaleBand()
         .domain(dates) // Use dates for the x-axis
@@ -116,7 +108,7 @@ export function dailyChart() {
         .text('Date');
 
       const y = d3.scaleLinear()
-        .domain([0, d3.max(energyGenerationValues)])
+        .domain([0, d3.max(electricityConsumptionValues)])
         .range([height, 0]);
       g.append("g")
         .call(d3.axisLeft(y));
@@ -134,7 +126,7 @@ export function dailyChart() {
         .y(d => y(d));
 
       g.append("path")
-        .datum(energyGenerationValues)
+        .datum(electricityConsumptionValues)
         .attr("fill", "none")
         .attr("stroke", "url(#gradient)")
         .attr("stroke-width", 1.5)

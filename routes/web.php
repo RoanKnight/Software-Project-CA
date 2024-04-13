@@ -63,6 +63,7 @@ Route::prefix('electricity')->group(function () {
   Route::get('/create', [ElectricityUsageController::class, 'create'])->name('electricity.create');
   Route::post('/', [ElectricityUsageController::class, 'store'])->name('electricity.store');
   Route::get('/update-electricity-data', [ElectricityUsageController::class, 'updateElectricityData'])->name('electricity.updateElectricityData');
+  Route::get('/get-electricity-data', [ElectricityUsageController::class, 'getElectricityData'])->name('electricity.getElectricityData');
   Route::get('/dashboard', [ElectricityUsageController::class, 'dashboard'])->name('electricity.dashboard');
   Route::get('/{electricityUsage}', [ElectricityUsageController::class, 'show'])->name('electricity.show');
   Route::delete('/{electricityUsage}', [ElectricityUsageController::class, 'destroy'])->name('electricity.destroy');

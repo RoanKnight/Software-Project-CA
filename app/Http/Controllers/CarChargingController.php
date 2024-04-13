@@ -36,7 +36,7 @@ class CarChargingController extends Controller
   public function store(Request $request)
   {
     $user = auth()->user();
-    $activeLocation = $user->locations()->where('MPRN', session('active_location_MPRN'))->first();
+    $activeLocation = Location::where('MPRN', $user->active_MPRN)->first();
 
     if ($activeLocation && !$activeLocation->deleted) {
       $chargingRatePerMinute = rand(7, 11) / 60;
@@ -60,17 +60,26 @@ class CarChargingController extends Controller
   public function dashboard()
   {
     $user = auth()->user();
-    $locations = Location::where('user_id', auth()->id())->get();
-    $carCharging = CarCharging::whereIn('location_MPRN', $locations->pluck('MPRN'))->get();
+    $activeLocation = Location::where('MPRN', $user->active_MPRN)->first();
+
+    $carChargings = collect();
+
+    if ($activeLocation) {
+      $carChargings = CarCharging::where('location_MPRN', $activeLocation->MPRN)->get();
+    }
 
     return view('carCharging.dashboard', [
       'user' => $user,
-      'carCharging' => $carCharging,
-      'locations' => $locations,
+      'carChargings' => $carChargings,
+      'activeLocation' => $activeLocation,
     ]);
   }
 
   public function show(string $id)
   {
+    $carCharging = CarCharging::find($id);
+    return view('carCharging.show', [
+      'carCharging' => $carCharging
+    ]);
   }
 }

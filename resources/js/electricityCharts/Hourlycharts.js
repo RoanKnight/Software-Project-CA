@@ -18,7 +18,7 @@ export function hourlyChart() {
     .append("svg")
     .attr("viewBox", `0 0 ${width + margin.left + margin.right} ${height + margin.top + margin.bottom}`)
     .append("g")
-    .attr("transform", `translate(${margin.left},${margin.top})`); 
+    .attr("transform", `translate(${margin.left},${margin.top})`);
 
   const gradient = svg.append("defs")
     .append("linearGradient")
@@ -42,7 +42,7 @@ export function hourlyChart() {
   const g = svg.append("g")
     .attr("transform", `translate(${margin.left},${margin.top})`);
 
-  fetch('/solar/get-solar-data')
+  fetch('/electricity/get-electricity-data')
     .then(response => response.json())
     .then(data => {
       const today = new Date();
@@ -64,18 +64,27 @@ export function hourlyChart() {
       const yesterdayData = data.find(item => item.date === yesterdayStr);
 
       if (todayData) {
-        const hours = todayData.hours.filter(item => item.energyGeneration_kwh > 0).map(item => item.hour);
-        const energyGenerationValues = todayData.hours.filter(item => item.energyGeneration_kwh > 0).map(item =>
-          item.energyGeneration_kwh);
-        const totalEnergy = energyGenerationValues.reduce((total, energy) => total + energy, 0);
+        const times = todayData.times.filter(item => item.energyUsage_kwh > 0).map(item => item.time);
+        // Filter specificHours to include only the hours for which you have data
+        const specificHours = Array.from({ length: 24 }, (v, i) => (i < 10 ? '0' : '') + i + ':00')
+          .filter(hour => times.some(time => time.startsWith(hour)));
+        const electricityConsumptionValues = todayData.times.filter(item => item.energyUsage_kwh > 0).map(item =>
+          item.energyUsage_kwh);
+        const totalEnergy = electricityConsumptionValues.reduce((total, energy) => total + energy, 0);
         document.querySelector('.totalEnergy').textContent = totalEnergy.toFixed(2) + " kWh";
-        const averageEnergy = totalEnergy / energyGenerationValues.length;
+        const averageEnergy = totalEnergy / electricityConsumptionValues.length;
         document.querySelector('.averageEnergy').textContent = `${averageEnergy.toFixed(2)} kWh`;
+        const randomRate = 0.25 + Math.random() * (0.25 - 0.2);
+        const totalElectricityCost = totalEnergy * randomRate;
+        document.querySelector('.totalCost').textContent = `$${totalElectricityCost.toFixed(2)}`;
+        const averageElectricityCost = (averageEnergy * randomRate) * 12;
+        document.querySelector('.averageCost').textContent = `$${averageElectricityCost.toFixed(2)}`;
+
 
         if (yesterdayData) {
-          const yesterdayEnergyGenerationValues = yesterdayData.hours.map(item => item.energyGeneration_kwh);
-          const yesterdayTotalEnergy = yesterdayEnergyGenerationValues.reduce((total, energy) => total + energy, 0);
-          const yesterdayAverageEnergy = yesterdayTotalEnergy / yesterdayEnergyGenerationValues.length;
+          const yesterdayelectricityConsumptionValues = yesterdayData.times.map(item => item.energyUsage_kwh);
+          const yesterdayTotalEnergy = yesterdayelectricityConsumptionValues.reduce((total, energy) => total + energy, 0);
+          const yesterdayAverageEnergy = yesterdayTotalEnergy / yesterdayelectricityConsumptionValues.length;
 
           const totalDifference = totalEnergy - yesterdayTotalEnergy;
           const averageDifference = averageEnergy - yesterdayAverageEnergy;
@@ -94,20 +103,20 @@ export function hourlyChart() {
         }
 
         const x = d3.scaleBand()
-          .domain(hours)
+          .domain(times)
           .range([0, width]);
         g.append("g")
           .attr("transform", `translate(0, ${height})`)
-          .call(d3.axisBottom(x));
+          .call(d3.axisBottom(x).tickValues(specificHours));
 
         svg.append('text')
           .attr('text-anchor', 'end')
           .attr('x', width / 2)
           .attr('y', height + margin.top + 40)
-          .text('Hours');
+          .text('Times');
 
         const y = d3.scaleLinear()
-          .domain([0, d3.max(energyGenerationValues)])
+          .domain([0, d3.max(electricityConsumptionValues)])
           .range([height, 0]);
         g.append("g")
           .call(d3.axisLeft(y));
@@ -121,11 +130,11 @@ export function hourlyChart() {
 
         const line = d3.line()
           .curve(d3.curveBasis)
-          .x((d, i) => x(hours[i]) + x.bandwidth() / 2)
+          .x((d, i) => x(times[i]) + x.bandwidth() / 2)
           .y(d => y(d));
 
         g.append("path")
-          .datum(energyGenerationValues)
+          .datum(electricityConsumptionValues)
           .attr("fill", "none")
           .attr("stroke", "url(#gradient)")
           .attr("stroke-width", 1.5)
@@ -133,3 +142,16 @@ export function hourlyChart() {
       }
     })
 }
+
+
+[
+  {
+    "date": "11-04-2024",
+    "times": [
+      {
+        "time": "00:00",
+        "energyUsage_kwh": 0.023
+      },
+    ]
+  }
+]

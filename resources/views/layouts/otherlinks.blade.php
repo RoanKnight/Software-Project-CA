@@ -4,7 +4,7 @@
       [
           'route' => 'profile.edit',
           'image' => '/images/User-icon.png',
-          'title' => 'User',
+          'title' => Auth::user()->name,
       ],
       [
           'route' => 'logout',

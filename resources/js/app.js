@@ -90,4 +90,37 @@ document.addEventListener("DOMContentLoaded", function () {
       }
     });
   }
+
+  // Define initial map parameters
+  var initialLatitude = 53.3498;
+  var initialLongitude = -6.2603;
+  var initialZoomLevel = 13;
+
+
+  var mapElement = document.querySelector('.map-display');
+  if (mapElement) {
+    // Initialize the map
+    var map = L.map(mapElement).setView([initialLatitude, initialLongitude], initialZoomLevel);
+
+    // Set up the OSM layer
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom: 19,
+      attribution: 'Map data © <a href="https://openstreetmap.org">OpenStreetMap</a> contributors'
+    }).addTo(map);
+
+    stations.forEach(function (station) {
+      L.marker([station.AddressInfo.Latitude, station.AddressInfo.Longitude]).addTo(map)
+        .bindPopup(`
+          <h2>Station: ${station.AddressInfo.Title}</h2>
+          ${station.AddressInfo.AddressLine1 ? `<p>Address: ${station.AddressInfo.AddressLine1}</p>` : ''}
+          ${station.AddressInfo.Town ? `<p>Town: ${station.AddressInfo.Town}</p>` : ''}
+          ${station.AddressInfo.StateOrProvince ? `<p>State/Province: ${station.AddressInfo.StateOrProvince}</p>` : ''}
+          ${station.AddressInfo.Postcode ? `<p>Postcode: ${station.AddressInfo.Postcode}</p>` : ''}
+          <p>Number of Stations/Bays: ${station.NumberOfPoints}</p>
+          <p>Operational Status: ${station.StatusType ? (station.StatusType.IsOperational ? 'Operational' : 'Non Operational') : 'Unknown'}</p>
+          <p>Usage: ${station.UsageType ? station.UsageType.Title : 'Unknown'}</p>
+          <a href="https://www.google.com/maps?q=${station.AddressInfo.Latitude},${station.AddressInfo.Longitude}" target="_blank">Navigate</a>
+        `);
+    });
+  }
 });

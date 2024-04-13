@@ -95,30 +95,72 @@ class ElectricityUsageController extends Controller
         if ($dateEntry === null) {
           $dateEntry = [
             'date' => $currentDate,
-            'hours' => []
+            'times' => []
           ];
           $data[] = &$dateEntry;
           Storage::put($path, json_encode($data, JSON_PRETTY_PRINT));
         } else {
-          $lastHourEntry = end($dateEntry['hours']);
-          if ($lastHourEntry !== false && $lastHourEntry['hour'] === '23:55') {
+          $lastTimeEntry = end($dateEntry['times']);
+          if ($lastTimeEntry !== false && $lastTimeEntry['time'] === '23:55') {
             continue;
           }
 
-          $nextHour = $lastHourEntry && isset($lastHourEntry['hour']) ? ((int) substr($lastHourEntry['hour'], 0, 2)) : -1;
-          $nextMinute = $lastHourEntry && isset($lastHourEntry['hour']) ? ((int) substr($lastHourEntry['hour'], 3, 2) + 5) % 60 : 0;
-          if ($nextMinute === 0 && $lastHourEntry !== null) {
-            $nextHour = ($nextHour + 1) % 24;
+          $nextTime = $lastTimeEntry && isset($lastTimeEntry['time']) ? ((int) substr($lastTimeEntry['time'], 0, 2)) : -1;
+          $nextMinute = $lastTimeEntry && isset($lastTimeEntry['time']) ? ((int) substr($lastTimeEntry['time'], 3, 2) + 5) % 60 : 0;
+          if ($nextMinute === 0 && $lastTimeEntry !== null) {
+            $nextTime = ($nextTime + 1) % 24;
           }
 
-          $dateEntry['hours'][] = [
-            'hour' => sprintf('%02d:%02d', $nextHour, $nextMinute),
-            'energyUsage_kwh' => rand(10, 20) / 600,
+          $dateEntry['times'][] = [
+            'time' => sprintf('%02d:%02d', $nextTime, $nextMinute),
+            'energyUsage_kwh' => round(rand(26, 33) / 24 / 12, 3),
           ];
 
           Storage::put($path, json_encode($data, JSON_PRETTY_PRINT));
         }
       }
+    }
+  }
+
+  public function getElectricityData()
+  {
+    // Fetch the active location MPRN from the User model
+    $activeLocationMPRN = auth()->user()->active_MPRN;
+
+    // Find the location with the active MPRN
+    $location = Location::where('MPRN', $activeLocationMPRN)->first();
+
+    if (!$location) {
+      return response()->json(['error' => 'No active location found.'], 404);
+    }
+
+    $address = str_replace(' ', '_', $location->address);
+    $filePath = 'users/' . $location->user->email . '/' . $address . '/electricity.json';
+
+    if (Storage::exists($filePath)) {
+      $data = Storage::get($filePath);
+
+      $jsonData = json_decode($data, true);
+
+      $electricityConsumptionValues = [];
+
+      foreach ($jsonData as $dateData) {
+        $dateElectricityConsumptionValues = array_map(function ($time) {
+          return [
+            'time' => $time['time'],
+            'energyUsage_kwh' => $time['energyUsage_kwh'],
+          ];
+        }, $dateData['times']);
+
+        $electricityConsumptionValues[] = [
+          'date' => $dateData['date'],
+          'times' => $dateElectricityConsumptionValues,
+        ];
+      }
+
+      return response()->json($electricityConsumptionValues);
+    } else {
+      return response()->json(['error' => 'File does not exist.'], 404);
     }
   }
 

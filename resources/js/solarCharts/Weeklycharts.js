@@ -44,9 +44,114 @@ export function weeklyChart() {
     .then(response => response.json())
     .then(data => {
       const today = new Date();
-      const previousMonth = new Date(today) - 30;
+      const previousMonth = new Date(today);
+      previousMonth.setDate(today.getDate() - 28);
+      previousMonth.setHours(0, 0, 0, 0);
+
+      // Convert date from "DD-MM-YYYY" to "MM-DD-YYYY"
+      function convertDate(inputFormat) {
+        let parts = inputFormat.split('-');
+        return new Date(parts[2], parts[1] - 1, parts[0]);
+      }
 
       // Filter out the data that is older than 30 days
-      const recentData = data.filter(item => new Date(item.date) >= previousMonth);
+      const recentData = data.filter(item => convertDate(item.date) > previousMonth);
+
+      console.log(recentData);
+
+      // Group data by week
+      const groupedByWeek = [];
+      for (let i = 0; i < recentData.length; i += 7) {
+        groupedByWeek.push(recentData.slice(i, i + 7));
+      }
+
+      console.log(groupedByWeek);
+
+      const weeklyEnergyGeneration = groupedByWeek.map(weekData => {
+        const totalEnergy = weekData.reduce((total, day) => {
+          const dayEnergy = day.hours.reduce((total, hour) => total + hour.energyGeneration_kwh, 0);
+          return total + dayEnergy;
+        }, 0);
+        return {
+          week: new Date(weekData[0].date),
+          totalEnergy
+        };
+      });
+
+      console.log(weeklyEnergyGeneration);
+
+      const totalEnergy = weeklyEnergyGeneration.reduce((total, item) => total + item.totalEnergy, 0);
+      document.querySelector('.totalEnergy').textContent = totalEnergy.toFixed(2) + " kWh";
+      const averageEnergy = totalEnergy / weeklyEnergyGeneration.length;
+      document.querySelector('.averageEnergy').textContent = `${averageEnergy.toFixed(2)} kWh`;
+
+      if (weeklyEnergyGeneration.length < 4) {
+        document.querySelector('.previousTotal').textContent = 'Not enough data for previous month comparison';
+        document.querySelector('.averageComparison').textContent = 'Not enough data for previous month comparison';
+      } else {
+        const currentMonthEnergy = weeklyEnergyGeneration.reduce((total, item) => total + item.totalEnergy, 0).toFixed(2);
+        const previousMonthEnergy = weeklyEnergyGeneration.slice(0, 4).reduce((total, item) => total + item.totalEnergy, 0).toFixed(2);
+        const currentMonthAverage = currentMonthEnergy / 4;
+        const previousMonthAverage = previousMonthEnergy / 4;
+
+        const totalDifference = currentMonthEnergy - previousMonthEnergy;
+        const averageDifference = currentMonthAverage - previousMonthAverage;
+
+        const comparison = totalDifference > 0 ? 'more' : 'less';
+        const colorClass = comparison === 'more' ? 'text-green-500' : 'text-red-500';
+
+        const totalDifferenceElement = `<span class="${colorClass}">${Math.abs(totalDifference.toFixed(2))} kWh</span>`;
+        document.querySelector('.previousTotal').innerHTML = `${totalDifferenceElement} ${comparison} than last month`;
+
+        const averageDifferenceElement = `<span class="${colorClass}">${Math.abs(averageDifference.toFixed(2))} kWh</span>`;
+        document.querySelector('.averageComparison').innerHTML = `${averageDifferenceElement} ${comparison} than last month`;
+      }
+
+      const dates = groupedByWeek.map(weekData => weekData[0].date);
+      const energyGenerationValues = weeklyEnergyGeneration.map(item => item.totalEnergy);
+
+      const parseDate = d3.timeParse("%d-%m-%Y");
+      let datesAsDateObjects = dates.map(dateStr => parseDate(dateStr));
+
+      datesAsDateObjects = datesAsDateObjects.sort((a, b) => a - b);
+
+      const x = d3.scaleBand()
+        .domain(datesAsDateObjects)
+        .range([0, width]);
+
+      g.append("g")
+        .attr("transform", `translate(0, ${height})`)
+        .call(d3.axisBottom(x).tickFormat(d3.timeFormat("%d-%m-%Y")));
+
+      svg.append('text')
+        .attr('text-anchor', 'end')
+        .attr('x', width / 2)
+        .attr('y', height + margin.top + 40)
+        .text('Date');
+
+      const y = d3.scaleLinear()
+        .domain([0, d3.max(energyGenerationValues)])
+        .range([height, 0]);
+      g.append("g")
+        .call(d3.axisLeft(y));
+
+      svg.append('text')
+        .attr('text-anchor', 'end')
+        .attr('transform', 'rotate(-90)')
+        .attr('y', -margin.left + 20)
+        .attr('x', -height / 2)
+        .text('Total Energy (kWh)');
+
+      const line = d3.line()
+        .curve(d3.curveBasis)
+        .x((d, i) => x(datesAsDateObjects[i]) + x.bandwidth() / 2)
+        .y(d => y(d));
+
+      g.append("path")
+        .datum(energyGenerationValues)
+        .attr("fill", "none")
+        .attr("stroke", "url(#gradient)")
+        .attr("stroke-width", 1.5)
+        .attr("d", line);
     });
 }

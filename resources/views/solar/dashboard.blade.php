@@ -21,7 +21,7 @@
 
 <body class="font-sans bg-background">
   <div class="grid grid-cols-20 gap-6">
-    <div class="col-span-3 bg-white px-10 pt-10 h-screen rounded-l-3xl">
+    <div class="col-span-4 bg-white px-10 pt-10 h-screen rounded-l-3xl">
       <div class="flex justify-center border-b pb-5">
         <img src="/images/Solar-icon.png" alt="">
         <h1 class="text-3xl pl-4 font-medium">Dashboard</h1>
@@ -49,7 +49,7 @@
       <x-logout-modal />
     </div>
 
-    <div class="col-span-12 max-h-full">
+    <div class="col-span-12 max-h-screen">
       <p class="text-lg font-light mt-12 mb-10">General overview</p>
       <h1 class="text-4xl font-medium mb-10">Your energy generation metrics</h1>
 
@@ -105,15 +105,41 @@
       $estimatedSolarGeneration = number_format($estimatedSolarGeneration, 2);
     @endphp
 
-    <div class="col-span-4 bg-white h-fit mt-48 p-5 rounded-3xl">
-      <p>Current temperature: {{ $weather['main']['temp'] - 273.15 }}°C</p>
-      <p>Feels like: {{ $weather['main']['feels_like'] - 273.15 }}°C</p>
-      <p>Humidity: {{ $weather['main']['humidity'] }}%</p>
-      <p>Wind speed: {{ $weather['wind']['speed'] }} m/s</p>
-      <p>Sunrise: {{ date('H:i:s', $weather['sys']['sunrise']) }}</p>
-      <p>Sunset: {{ date('H:i:s', $weather['sys']['sunset']) }}</p>
-      <p>Atmospheric pressure: {{ $weather['main']['pressure'] }} hPa</p>
-      <p>Estimated solar generation today: {{ $estimatedSolarGeneration }} kWh</p>
+<div class="col-span-3 flex flex-col">
+  <div class="bg-white h-fit mt-48 px-5 py-10 rounded-3xl flex-shrink-0">
+        <div class="text-center">
+          <h1 class="text-3xl font-semibold">Today</h1>
+          <h3 class="text-xl">{{ now()->format('F j') }}</h3>
+        </div>
+        <img class="mx-auto w-52" src="http://openweathermap.org/img/w/{{ $weather['weather'][0]['icon'] }}.png"
+          alt="Weather icon">
+
+        <p class="text-lg text-center">{{ $weather['weather'][0]['description'] }}</p>
+
+        <div class="flex justify-between mt-5 mx-8">
+          <div>
+            <h2 class="text-2xl mb-4">Temp</h2>
+            <p class="mb-6 text-3xl font-bold"> {{ $weather['main']['temp'] - 273.15 }}°C</p>
+
+            <div class="flex">
+              <img src="/images/Humidity.png" alt="" class="mr-4" style="height: 25px; width: 25px">
+              <p>{{ $weather['main']['humidity'] }}%</p>
+            </div>
+          </div>
+          <div>
+            <h2 class="text-2xl mb-4">Feels like</h2>
+            <p class="mb-6 text-3xl font-bold"> {{ $weather['main']['feels_like'] - 273.15 }}°C</p>
+
+            <div class="flex">
+              <img src="/images/Wind.png" alt="" class="mr-4" style="height: 25px; width: 25px">
+              <p>{{ $weather['wind']['speed'] }} m/s</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="bg-white flex-grow mt-5 px-5 py-10 rounded-3xl">
+        <h2>Your content here</h2>
+      </div>
     </div>
   </div>
 </body>

@@ -15,11 +15,10 @@ class DatabaseSeeder extends Seeder
 
       $this->call([
         UserSeeder::class,
-        LocationSeeder::class
-        // SolarPanelSeeder::class,
-        // ElectricityUsageSeeder::class,
-        // CarChargingSeeder::class,
-        // CHargingLocationSeeder::class,
+        LocationSeeder::class,
+        SolarPanelSeeder::class,
+        ElectricityUsageSeeder::class,
+        CarChargingSeeder::class
     ]);
     }
 }

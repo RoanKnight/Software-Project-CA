@@ -4,15 +4,19 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\ChargingStation;
+use App\Services\OpenChargeMapService;
 use Illuminate\Support\Facades\Storage;
 use Auth;
 
 class ChargingStationController extends Controller
 {
-  public function __construct()
+  protected $openChargeMapService;
+
+  public function __construct(OpenChargeMapService $openChargeMapService)
   {
     $this->middleware('auth', ['except' => []]);
     $this->middleware('role:admin', ['only' => ['create', 'store', 'delete', 'restore', 'index']]);
+    $this->openChargeMapService = $openChargeMapService;
   }
 
   public function index()
@@ -56,10 +60,13 @@ class ChargingStationController extends Controller
 
   public function dashboard()
   {
+    $stations = $this->openChargeMapService->getStations(53.3498, -6.2603, 10);
+
     $chargingStation = ChargingStation::all();
 
     return view('chargingStations.dashboard', [
-      'chargingStation' => $chargingStation
+      'chargingStation' => $chargingStation,
+      'stations' => $stations
     ]);
   }
 

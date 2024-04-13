@@ -1,6 +1,6 @@
 import * as d3 from 'd3';
 
-export function dailyChart() {
+export function monthlyChart() {
   document.querySelector('.totalEnergy').textContent = '';
   document.querySelector('.previousTotal').textContent = '';
   document.querySelector('.averageEnergy').textContent = '';
@@ -44,9 +44,8 @@ export function dailyChart() {
     .then(response => response.json())
     .then(data => {
       const today = new Date();
-      const previousWeek = new Date(today);
-      previousWeek.setDate(today.getDate() - 14);
-      previousWeek.setHours(0, 0, 0, 0);
+      const previousYear = new Date(today.getFullYear() - 1, today.getMonth(), today.getDate());
+      previousYear.setHours(0, 0, 0, 0);
 
       // Convert date from "DD-MM-YYYY" to "MM-DD-YYYY"
       function convertDate(inputFormat) {
@@ -54,60 +53,74 @@ export function dailyChart() {
         return new Date(parts[2], parts[1] - 1, parts[0]);
       }
 
-      // Filter out the data that is older than 6 days
-      const recentData = data.filter(item => convertDate(item.date) >= previousWeek);
+      // Filter out the data that is older than 1 year
+      const recentData = data.filter(item => convertDate(item.date) >= previousYear);
 
-      // For each day, sum up the energy generation of all hours
-      const dailyEnergyGeneration = recentData.map(item => {
-        const totalEnergy = item.hours.reduce((total, hour) => total + hour.energyGeneration_kwh, 0);
+      // Group data by week
+      const groupedByMonth = [];
+      for (let i = 0; i < recentData.length; i += 30) {
+        groupedByMonth.push(recentData.slice(i, i + 30));
+      }
+
+      const monthlyElectricityConsumption = groupedByMonth.map(monthData => {
+        const totalEnergy = monthData.reduce((total, day) => {
+          const dayEnergy = day.hours.reduce((total, hour) => total + hour.energyGeneration_kwh, 0);
+          return total + dayEnergy;
+        }, 0);
         return {
-          date: item.date,
+          month: convertDate(monthData[0].date),
           totalEnergy
         };
       });
 
-      console.log(dailyEnergyGeneration);
+      console.log(monthlyElectricityConsumption);
 
-      const totalEnergy = dailyEnergyGeneration.reduce((total, item) => total + item.totalEnergy, 0);
+      const totalEnergy = monthlyElectricityConsumption.reduce((total, item) => total + item.totalEnergy, 0);
       document.querySelector('.totalEnergy').textContent = totalEnergy.toFixed(2) + " kWh";
-      const averageEnergy = totalEnergy / dailyEnergyGeneration.length;
+      const averageEnergy = totalEnergy / monthlyElectricityConsumption.length;
       document.querySelector('.averageEnergy').textContent = `${averageEnergy.toFixed(2)} kWh`;
 
-      if (dailyEnergyGeneration.length < 7) {
-        document.querySelector('.previousTotal').textContent = 'Not enough data for previous week comparison';
-        document.querySelector('.averageComparison').textContent = 'Not enough data for previous week comparison';
+      if (monthlyElectricityConsumption.length < 12) {
+        document.querySelector('.previousTotal').textContent = 'Not enough data for previous year comparison';
+        document.querySelector('.averageComparison').textContent = 'Not enough data for previous year comparison';
       } else {
-        const currentWeekEnergy = dailyEnergyGeneration.slice(0, 7).reduce((total, item) => total + item.totalEnergy, 0).toFixed(2);
-        console.log(currentWeekEnergy);
-        const previousWeekEnergy = dailyEnergyGeneration.slice(7, 14).reduce((total, item) => total + item.totalEnergy, 0).toFixed(2);
-        console.log(previousWeekEnergy);
-        const currentWeekAverage = currentWeekEnergy / 7;
-        const previousWeekAverage = previousWeekEnergy / 7;
+        const currentYearEnergy = monthlyElectricityConsumption.slice(0, 12).reduce((total, item) => total + item.totalEnergy, 0).toFixed(2);
+        const previousYearEnergy = monthlyElectricityConsumption.slice(12, 24).reduce((total, item) => total + item.totalEnergy, 0).toFixed(2);
+        const currentYearAverage = currentYearEnergy / 12;
+        const previousYearAverage = previousYearEnergy / 12;
 
-        const totalDifference = currentWeekEnergy - previousWeekEnergy;
-        const averageDifference = currentWeekAverage - previousWeekAverage;
+        const totalDifference = currentYearEnergy - previousYearEnergy;
+        const averageDifference = currentYearAverage - previousYearAverage;
 
         const comparison = totalDifference > 0 ? 'more' : 'less';
         const colorClass = comparison === 'more' ? 'text-green-500' : 'text-red-500';
 
         const totalDifferenceElement = `<span class="${colorClass}">${Math.abs(totalDifference.toFixed(2))} kWh</span>`;
-        document.querySelector('.previousTotal').innerHTML = `${totalDifferenceElement} ${comparison} than last week`;
+        document.querySelector('.previousTotal').innerHTML = `${totalDifferenceElement} ${comparison} than last year`;
 
         const averageDifferenceElement = `<span class="${colorClass}">${Math.abs(averageDifference.toFixed(2))} kWh</span>`;
-        document.querySelector('.averageComparison').innerHTML = `${averageDifferenceElement} ${comparison} than yesterday`;
+        document.querySelector('.averageComparison').innerHTML = `${averageDifferenceElement} ${comparison} than last year`;
       }
 
+      const dates = monthlyElectricityConsumption.map(monthData => monthData.month);
+      const electricityConsumptionValues = monthlyElectricityConsumption.map(item => item.totalEnergy);
 
-      // Use the summed up values for the y-axis and the dates for the x-axis
-      const dates = dailyEnergyGeneration.map(item => item.date);
-      const energyGenerationValues = dailyEnergyGeneration.map(item => item.totalEnergy);
+      const parseDate = d3.timeParse("%d-%m-%Y");
+      let datesAsDateObjects = dates.map(date => {
+        let dateStr = `${date.getDate()}-${date.getMonth() + 1}-${date.getFullYear()}`;
+        return parseDate(dateStr);
+      });
+
+      datesAsDateObjects = datesAsDateObjects.sort((a, b) => a - b);
+
+      console.log(datesAsDateObjects);
 
       const x = d3.scaleBand()
-        .domain(dates) // Use dates for the x-axis
+        .domain(datesAsDateObjects)
         .range([0, width]);
       g.append("g")
         .attr("transform", `translate(0, ${height})`)
-        .call(d3.axisBottom(x));
+        .call(d3.axisBottom(x).tickFormat(d3.timeFormat("%B %Y")));
 
       svg.append('text')
         .attr('text-anchor', 'end')
@@ -116,7 +129,7 @@ export function dailyChart() {
         .text('Date');
 
       const y = d3.scaleLinear()
-        .domain([0, d3.max(energyGenerationValues)])
+        .domain([0, d3.max(electricityConsumptionValues)])
         .range([height, 0]);
       g.append("g")
         .call(d3.axisLeft(y));
@@ -130,11 +143,11 @@ export function dailyChart() {
 
       const line = d3.line()
         .curve(d3.curveBasis)
-        .x((d, i) => x(dates[i]) + x.bandwidth() / 2)
+        .x((d, i) => x(datesAsDateObjects[i]) + x.bandwidth() / 2)
         .y(d => y(d));
 
       g.append("path")
-        .datum(energyGenerationValues)
+        .datum(electricityConsumptionValues)
         .attr("fill", "none")
         .attr("stroke", "url(#gradient)")
         .attr("stroke-width", 1.5)
