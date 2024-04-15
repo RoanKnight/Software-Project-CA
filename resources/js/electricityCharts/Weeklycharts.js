@@ -83,9 +83,15 @@ export function weeklyChart() {
       const averageEnergy = totalEnergy / weeklyElectricityConsumption.length;
       document.querySelector('.averageEnergy').textContent = `${averageEnergy.toFixed(2)} kWh`;
 
+      const totalElectricityCost = totalEnergy * 0.25;
+      document.querySelector('.totalCost').textContent = `€${totalElectricityCost.toFixed(2)}`;
+      const averageElectricityCost = averageEnergy * 0.25;
+      document.querySelector('.averageCost').textContent = `€${averageElectricityCost.toFixed(2)}`;
+
       if (weeklyElectricityConsumption.length < 4) {
         document.querySelector('.previousTotal').textContent = 'Not enough data for previous month comparison';
         document.querySelector('.averageComparison').textContent = 'Not enough data for previous month comparison';
+        document.querySelector('.costComparison').textContent = 'Not enough data for previous month comparison';
       } else {
         const currentMonthEnergy = weeklyElectricityConsumption.reduce((total, item) => total + item.totalEnergy, 0).toFixed(2);
         const previousMonthEnergy = weeklyElectricityConsumption.slice(0, 4).reduce((total, item) => total + item.totalEnergy, 0).toFixed(2);
@@ -103,8 +109,12 @@ export function weeklyChart() {
 
         const averageDifferenceElement = `<span class="${colorClass}">${Math.abs(averageDifference.toFixed(2))} kWh</span>`;
         document.querySelector('.averageComparison').innerHTML = `${averageDifferenceElement} ${comparison} than last month`;
+
+        const comparisonCost = (totalDifference > 0 && averageDifference > 0) ? 'more' : 'less';
+        const colorClassCost = comparisonCost === 'more' ? 'text-red-500' : 'text-green-500';
+        document.querySelector('.costComparison').innerHTML = `Your electricity cost for today is <span class="${colorClassCost}">€${Math.abs(totalDifference * 0.25).toFixed(2)}</span> ${comparisonCost} than last month`;
       }
-      
+
 
       const dates = groupedByWeek.map(weekData => weekData[0].date);
       const electricityConsumptionValues = weeklyElectricityConsumption.map(item => item.totalEnergy);

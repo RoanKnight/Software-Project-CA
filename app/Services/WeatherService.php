@@ -26,4 +26,22 @@ class WeatherService
 
     return json_decode($response->getBody(), true);
   }
+
+  public function getTomorrowWeather($location)
+  {
+    $response = $this->client->request('GET', 'forecast', [
+      'query' => [
+        'q' => $location,
+        'appid' => env('OPENWEATHERMAP_API_KEY'),
+      ],
+    ]);
+
+    $weatherData = json_decode($response->getBody(), true);
+
+    foreach ($weatherData['list'] as $forecast) {
+      if (date('Y-m-d', strtotime($forecast['dt_txt'])) == date('Y-m-d', strtotime('+1 day'))) {
+        return $forecast;
+      }
+    }
+  }
 }

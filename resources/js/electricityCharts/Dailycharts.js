@@ -88,6 +88,16 @@ export function dailyChart() {
 
         const averageDifferenceElement = `<span class="${colorClass}">${Math.abs(averageDifference.toFixed(2))} kWh</span>`;
         document.querySelector('.averageComparison').innerHTML = `${averageDifferenceElement} ${comparison} than yesterday`;
+
+        const totalElectricityCost = totalEnergy * 0.25;
+        document.querySelector('.totalCost').textContent = `€${totalElectricityCost.toFixed(2)}`;
+        const averageElectricityCost = averageEnergy * 0.25;
+        document.querySelector('.averageCost').textContent = `€${averageElectricityCost.toFixed(2)}`;
+
+        const comparisonCost = (totalDifference > 0 && averageDifference > 0) ? 'more' : 'less';
+        const colorClassCost = comparisonCost === 'more' ? 'text-red-500' : 'text-green-500';
+        document.querySelector('.costComparison').innerHTML = `Your electricity cost for today is <span class="${colorClassCost}">€${Math.abs(totalDifference * 0.25).toFixed(2)}</span> ${comparisonCost} than last week`;
+
       }
 
       // Use the summed up values for the y-axis and get the dates for the x-axis

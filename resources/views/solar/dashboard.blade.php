@@ -105,8 +105,8 @@
       $estimatedSolarGeneration = number_format($estimatedSolarGeneration, 2);
     @endphp
 
-<div class="col-span-3 flex flex-col">
-  <div class="bg-white h-fit mt-48 px-5 py-10 rounded-3xl flex-shrink-0">
+    <div class="col-span-3 flex flex-col">
+      <div class="bg-white h-fit mt-48 px-5 py-10 rounded-3xl flex-shrink-0">
         <div class="text-center">
           <h1 class="text-3xl font-semibold">Today</h1>
           <h3 class="text-xl">{{ now()->format('F j') }}</h3>
@@ -137,8 +137,36 @@
           </div>
         </div>
       </div>
-      <div class="bg-white flex-grow mt-5 px-5 py-10 rounded-3xl">
-        <h2>Your content here</h2>
+      <div class="bg-white h-fit mt-6 px-5 py-10 rounded-3xl flex-shrink-0">
+        <div class="text-center">
+          <h1 class="text-3xl font-semibold">Tomorrow</h1>
+          <h3 class="text-xl">{{ now()->addDay()->format('F j') }}</h3>
+        </div>
+        <img class="mx-auto w-52"
+          src="http://openweathermap.org/img/w/{{ $tomorrowWeather['weather'][0]['icon'] }}.png" alt="Weather icon">
+
+        <p class="text-lg text-center">{{ $tomorrowWeather['weather'][0]['description'] }}</p>
+
+        <div class="flex justify-between mt-5 mx-8">
+          <div>
+            <h2 class="text-2xl mb-4">Temp</h2>
+            <p class="mb-6 text-3xl font-bold"> {{ $tomorrowWeather['main']['temp'] - 273.15 }}°C</p>
+
+            <div class="flex">
+              <img src="/images/Humidity.png" alt="" class="mr-4" style="height: 25px; width: 25px">
+              <p>{{ $tomorrowWeather['main']['humidity'] }}%</p>
+            </div>
+          </div>
+          <div>
+            <h2 class="text-2xl mb-4">Feels like</h2>
+            <p class="mb-6 text-3xl font-bold"> {{ $tomorrowWeather['main']['feels_like'] - 273.15 }}°C</p>
+
+            <div class="flex">
+              <img src="/images/Wind.png" alt="" class="mr-4" style="height: 25px; width: 25px">
+              <p>{{ $tomorrowWeather['wind']['speed'] }} m/s</p>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </div>

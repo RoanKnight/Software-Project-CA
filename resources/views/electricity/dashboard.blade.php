@@ -81,14 +81,16 @@
         </div>
 
         @php
-          $currentEnergy = rand(10, 20) / 10.0;
-          $previousEntry = rand(10, 20) / 10.0;
+          $currentEnergy = rand(1, 2) / 10.0;
+          $previousEntry = rand(1, 2) / 10.0;
           $comparison = $currentEnergy > $previousEntry ? 'more' : 'less';
           $colorClass = $currentEnergy > $previousEntry ? 'text-green-500' : 'text-red-500';
+          $averageEnergy = rand(1, 2) / 10.0; // Replace with actual average energy consumption for the area
+          $projectedCost = $currentEnergy * 0.12; // Replace with actual method to calculate projected costs
         @endphp
 
         <div>
-          <h2 class="text-xl mb-8">Current energy generation</h2>
+          <h2 class="text-xl mb-8">Current electrcity consumption</h2>
           <h3 class="text-3xl mb-5 currentEnergy">{{ $currentEnergy }} kWh</h3>
           <p class="comparison"><span
               class="currentComparison {{ $colorClass }}">{{ abs($currentEnergy - $previousEntry) }}</span> kWh
@@ -97,14 +99,25 @@
       </div>
     </div>
 
-    <div class="col-span-3 flex flex-col">
+    <div class="col-span-3 flex flex-col max-h-screen">
       <div class="bg-white h-fit mt-48 px-5 py-10 rounded-3xl flex-shrink-0">
-        <h2 class="text-2xl mb-10">Estimated Total Cost</h2>
+        <h2 class="text-2xl mb-6 font-semibold">Estimated Total Cost</h2>
+        <h3 class="text-lg mb-6">Your total electricity cost</h3>
         <h1 class="text-3xl font-bold totalCost"></h1>
       </div>
       <div class="bg-white h-fit mt-5 px-5 py-10 rounded-3xl">
-        <h2 class="text-2xl mb-10">Average electricity cost</h2>
+        <h2 class="text-2xl mb-6 font-semibold">Estimated average cost</h2>
+        <h3 class="text-lg mb-6">Your average electricity cost</h3>
         <h1 class="text-3xl font-bold averageCost"></h1>
+      </div>
+      <div class="bg-white h-fit mt-5 px-5 py-10 rounded-3xl">
+        <h2 class="text-2xl mb-6 font-semibold">Electricity cost comparison</h2>
+        <h3 class="text-lg mb-6 costComparison"></h3>
+      </div>
+      <div class="bg-white h-fit mt-5 px-5 py-10 rounded-3xl">
+        <h2 class="text-2xl mb-6 font-semibold">Projected Costs</h2>
+        <h3 class="text-lg mb-6">Based on current usage, your projected cost is</h3>
+        <h1 class="text-3xl font-bold projectedCost">{{ $projectedCost }}</h1>
       </div>
     </div>
   </div>

@@ -182,12 +182,14 @@ class SolarPanelController extends Controller
 
     $location = 'Dún Laoghaire, IE';
     $weather = $this->weatherService->getCurrentWeather($location);
+    $tomorrowWeather = $this->weatherService->getTomorrowWeather($location);
 
     return view('solar.dashboard', [
       'user' => $user,
       'solarPanels' => $solarPanels,
       'locations' => $locations,
       'weather' => $weather,
+      'tomorrowWeather' => $tomorrowWeather,
     ]);
   }
 

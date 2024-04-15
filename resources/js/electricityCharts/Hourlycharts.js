@@ -68,17 +68,17 @@ export function hourlyChart() {
         // Filter specificHours to include only the hours for which you have data
         const specificHours = Array.from({ length: 24 }, (v, i) => (i < 10 ? '0' : '') + i + ':00')
           .filter(hour => times.some(time => time.startsWith(hour)));
-        const electricityConsumptionValues = todayData.times.filter(item => item.energyUsage_kwh > 0).map(item =>
+        const electricityConsumptionValues = todayData.times.filter(item => item.energyUsage_kwh).map(item =>
           item.energyUsage_kwh);
         const totalEnergy = electricityConsumptionValues.reduce((total, energy) => total + energy, 0);
         document.querySelector('.totalEnergy').textContent = totalEnergy.toFixed(2) + " kWh";
         const averageEnergy = totalEnergy / electricityConsumptionValues.length;
         document.querySelector('.averageEnergy').textContent = `${averageEnergy.toFixed(2)} kWh`;
-        const randomRate = 0.25 + Math.random() * (0.25 - 0.2);
-        const totalElectricityCost = totalEnergy * randomRate;
-        document.querySelector('.totalCost').textContent = `$${totalElectricityCost.toFixed(2)}`;
-        const averageElectricityCost = (averageEnergy * randomRate) * 12;
-        document.querySelector('.averageCost').textContent = `$${averageElectricityCost.toFixed(2)}`;
+        const electricityRate = 0.25;
+        const totalElectricityCost = totalEnergy * electricityRate;
+        document.querySelector('.totalCost').textContent = `€${totalElectricityCost.toFixed(2)}`;
+        const averageElectricityCost = averageEnergy * electricityRate;
+        document.querySelector('.averageCost').textContent = `€${averageElectricityCost.toFixed(2)}`;
 
 
         if (yesterdayData) {
@@ -97,6 +97,10 @@ export function hourlyChart() {
 
           const averageDifferenceElement = `<span class="${colorClass}">${Math.abs(averageDifference.toFixed(2))} kWh</span>`;
           document.querySelector('.averageComparison').innerHTML = `${averageDifferenceElement} ${comparison} than yesterday`;
+
+          const comparisonCost = (totalDifference > 0 && averageDifference > 0) ? 'more' : 'less';
+          const colorClassCost = comparisonCost === 'more' ? 'text-red-500' : 'text-green-500';
+          document.querySelector('.costComparison').innerHTML = `Your electricity cost for today is <span class="${colorClassCost}">€${Math.abs(totalDifference * electricityRate).toFixed(2)}</span> ${comparisonCost} than yesterday`;
         } else {
           document.querySelector('.previousTotal').textContent = '';
           document.querySelector('.averageComparison').textContent = '';
