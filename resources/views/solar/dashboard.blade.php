@@ -50,7 +50,7 @@
     </div>
 
     <div class="col-span-12 max-h-screen">
-      <p class="text-lg font-light mt-12 mb-10">General overview</p>
+      <p class="text-lg font-light mt-6 mb-6">General overview</p>
       <h1 class="text-4xl font-medium mb-10">Your energy generation metrics</h1>
 
       <div class="bg-white p-8 rounded-3xl mb-4">
@@ -105,7 +105,7 @@
       $estimatedSolarGeneration = number_format($estimatedSolarGeneration, 2);
     @endphp
 
-    <div class="col-span-3 flex flex-col">
+    <div class="col-span-3 flex flex-col max-h-screen">
       <div class="bg-white h-fit mt-48 px-5 py-10 rounded-3xl flex-shrink-0">
         <div class="text-center">
           <h1 class="text-3xl font-semibold">Today</h1>

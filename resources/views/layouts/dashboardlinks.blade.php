@@ -1,32 +1,41 @@
 <!-- dashboardlinks.blade.php -->
 @php
+  $user = auth()->user();
+  $hasSolar = $user->activeLocation && $user->activeLocation->solarPanels->isNotEmpty();
+  $hasElectricityUsage = $user->activeLocation && $user->activeLocation->electricityUsages->isNotEmpty();
+  $hasCarCharging = $user->activeLocation && $user->activeLocation->carChargings->isNotEmpty();
+
   $dashboardLinks = [
-      [
-          'route' => 'solar.dashboard',
-          'image' => '/images/Solar-dashboard-icon.png',
-          'title' => 'Solar Dashboard',
-      ],
-      [
-          'route' => 'electricity.dashboard',
-          'image' => '/images/Electricity-dashboard-icon.png',
-          'title' => 'Electricity usage',
-      ],
-      [
-          'route' => 'carCharging.dashboard',
-          'image' => '/images/CarCharging-dashboard-icon.png',
-          'title' => 'EV Charging',
-      ],
       [
           'route' => 'chargingStations.dashboard',
           'image' => '/images/ChargingLocations-dashboard-icon.png',
           'title' => 'Charging Locations',
       ],
-      [
-          'route' => 'profile.edit',
-          'image' => '/images/Settings.png',
-          'title' => 'Settings',
-      ],
   ];
+
+  if ($hasCarCharging) {
+      array_unshift($dashboardLinks, [
+          'route' => 'carCharging.dashboard',
+          'image' => '/images/CarCharging-dashboard-icon.png',
+          'title' => 'EV Charging',
+      ]);
+  }
+
+  if ($hasElectricityUsage) {
+      array_unshift($dashboardLinks, [
+          'route' => 'electricity.dashboard',
+          'image' => '/images/Electricity-dashboard-icon.png',
+          'title' => 'Electricity usage',
+      ]);
+  }
+
+  if ($hasSolar) {
+      array_unshift($dashboardLinks, [
+          'route' => 'solar.dashboard',
+          'image' => '/images/Solar-dashboard-icon.png',
+          'title' => 'Solar Dashboard',
+      ]);
+  }
 @endphp
 
 @foreach ($dashboardLinks as $link)

@@ -1,7 +1,5 @@
 import "./bootstrap";
 import Alpine from "alpinejs";
-import * as d3 from 'd3';
-window.Alpine = Alpine;
 Alpine.start();
 
 function printTimeUntilNextHour() {
@@ -72,6 +70,45 @@ document.addEventListener("DOMContentLoaded", function () {
   printTimeUntilNextHour();
   printTimeUntilNextFiveMinutes();
 
+  const menuItems = document.querySelectorAll('.menu .menu-item');
+  const forms = document.querySelectorAll('.form-content');
+
+  // Add active class to "Your account" menu item on page load
+  const yourAccountMenuItem = menuItems[0];
+  if (yourAccountMenuItem) {
+    yourAccountMenuItem.classList.add('border-l-2', 'border-l-blue-700', 'text-blue-700', 'active');
+  }
+
+  // Initially hide all forms except the first one
+  forms.forEach((form, index) => {
+    if (index !== 0) {
+      form.classList.add('hidden');
+    }
+  });
+
+  menuItems.forEach((item, index) => {
+    item.addEventListener('click', function () {
+      // Remove active class from all menu items
+      menuItems.forEach((menuItem) => {
+        menuItem.classList.remove('border-l-2', 'border-l-blue-700', 'text-blue-700', 'active');
+      });
+
+      // Add active class to clicked menu item
+      this.classList.add('border-l-2', 'border-l-blue-700', 'text-blue-700', 'active');
+
+      // Hide all forms
+      forms.forEach((form) => {
+        form.classList.add('hidden');
+      });
+
+      // Show the form corresponding to the clicked menu item
+      const form = forms[index];
+      if (form) {
+        form.classList.remove('hidden');
+      }
+    });
+  });
+
   document.body.classList.add("light");
 
   var modeToggler = document.querySelector(".modeToggler");
@@ -91,7 +128,6 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   }
 
-  // Define initial map parameters
   var initialLatitude = 53.3498;
   var initialLongitude = -6.2603;
   var initialZoomLevel = 13;
@@ -99,10 +135,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
   var mapElement = document.querySelector('.map-display');
   if (mapElement) {
-    // Initialize the map
     var map = L.map(mapElement).setView([initialLatitude, initialLongitude], initialZoomLevel);
 
-    // Set up the OSM layer
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       maxZoom: 19,
       attribution: 'Map data © <a href="https://openstreetmap.org">OpenStreetMap</a> contributors'
