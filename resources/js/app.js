@@ -73,12 +73,6 @@ document.addEventListener("DOMContentLoaded", function () {
   const menuItems = document.querySelectorAll('.menu .menu-item');
   const forms = document.querySelectorAll('.form-content');
 
-  // Add active class to "Your account" menu item on page load
-  const yourAccountMenuItem = menuItems[0];
-  if (yourAccountMenuItem) {
-    yourAccountMenuItem.classList.add('border-l-2', 'border-l-blue-700', 'text-blue-700', 'active');
-  }
-
   // Initially hide all forms except the first one
   forms.forEach((form, index) => {
     if (index !== 0) {

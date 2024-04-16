@@ -42,7 +42,7 @@
       <div class="col-span-2 hidden sm:block">
         <ul class="menu">
           <li
-            class="menu-item mt-5 cursor-pointer border-l-2 border-transparent px-2 py-2 font-semibold transition hover:border-l-blue-700 hover:text-blue-700">
+            class="menu-item mt-5 cursor-pointer border-l-2 border-transparent px-2 py-2 font-semibold transition border-l-blue-700  hover:border-l-blue-700 hover:text-blue-700 text-blue-700 active">
             Your account
           </li>
           @if (auth()->check() && auth()->user()->isAdmin())
@@ -80,23 +80,24 @@
           @include('profile.partials.update-password-form')
           @include('profile.partials.delete-user-form')
         </div>
-    
-        <div class="database-management form-content">
-          @include('profile.partials.database-management-form')
-        </div>
-    
+
+        @if (auth()->check() && auth()->user()->isAdmin())
+          <div class="database-management form-content">
+            @include('profile.partials.database-management-form')
+          </div>
+        @else
+        @endif
+
         <div class="locations form-content">
-          {{-- @include('profile.partials.update-profile-information-form')
-          @include('profile.partials.update-password-form')
-          @include('profile.partials.delete-user-form') --}}
+          @include('../../locations/user-locations')
         </div>
-    
+
         <div class="solar-panels form-content">
         </div>
-    
+
         <div class="electricity-usage form-content">
         </div>
-    
+
         <div class="car-chargings form-content">
         </div>
       </div>
