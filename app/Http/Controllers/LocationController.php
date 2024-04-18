@@ -13,7 +13,7 @@ class LocationController extends Controller
   public function __construct()
   {
     $this->middleware('auth', ['except' => []]);
-    $this->middleware('role:admin', ['only' => ['delete', 'restore', 'index']]);
+    $this->middleware('role:admin', ['only' => ['restore', 'index']]);
   }
 
   public function index()
@@ -22,7 +22,7 @@ class LocationController extends Controller
     $locations = Location::all();
     return view('locations.index', [
       'locations' => $locations,
-      'users' => $users
+      'users' => $users,
     ]);
   }
 
@@ -36,13 +36,15 @@ class LocationController extends Controller
     }
 
     return view('locations.user-locations', [
-      'user_locations' => $userLocations
+      'user_locations' => $userLocations,
     ]);
   }
 
   public function create()
   {
-    return view('locations.create');
+    $locations = auth()->user()->locations;
+
+    return view('locations.create', ['locations' => $locations]);
   }
 
   public function store(Request $request)
@@ -79,7 +81,7 @@ class LocationController extends Controller
 
     $request->validate($rules, $messages);
 
-    $location = new Location;
+    $location = new Location();
     $location->MPRN = $request->MPRN;
     $location->address = $request->address;
     $location->EirCode = $request->EirCode;
@@ -108,7 +110,7 @@ class LocationController extends Controller
       $user->save();
     }
 
-    return redirect()->route('locations.index')->with('status', 'Created a new location');
+    return redirect()->route('profile.edit')->with('status', 'Created a new location');
   }
 
   public function setActiveLocation($MPRN)
@@ -129,7 +131,7 @@ class LocationController extends Controller
     $location = Location::findOrFail($id);
 
     return view('locations.show', [
-      'location' => $location
+      'location' => $location,
     ]);
   }
 
@@ -139,7 +141,7 @@ class LocationController extends Controller
 
     $location->update(['deleted' => true]);
 
-    return redirect()->route('locations.index')->with('status', 'Location deleted successfully');
+    return redirect()->back()->with('status', 'Location deleted successfully');
   }
 
   public function restore(string $id)

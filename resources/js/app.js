@@ -73,7 +73,6 @@ document.addEventListener("DOMContentLoaded", function () {
   const menuItems = document.querySelectorAll('.menu .menu-item');
   const forms = document.querySelectorAll('.form-content');
 
-  // Initially hide all forms except the first one
   forms.forEach((form, index) => {
     if (index !== 0) {
       form.classList.add('hidden');
@@ -82,20 +81,16 @@ document.addEventListener("DOMContentLoaded", function () {
 
   menuItems.forEach((item, index) => {
     item.addEventListener('click', function () {
-      // Remove active class from all menu items
       menuItems.forEach((menuItem) => {
         menuItem.classList.remove('border-l-2', 'border-l-blue-700', 'text-blue-700', 'active');
       });
 
-      // Add active class to clicked menu item
       this.classList.add('border-l-2', 'border-l-blue-700', 'text-blue-700', 'active');
 
-      // Hide all forms
       forms.forEach((form) => {
         form.classList.add('hidden');
       });
 
-      // Show the form corresponding to the clicked menu item
       const form = forms[index];
       if (form) {
         form.classList.remove('hidden');
@@ -139,16 +134,42 @@ document.addEventListener("DOMContentLoaded", function () {
     stations.forEach(function (station) {
       L.marker([station.AddressInfo.Latitude, station.AddressInfo.Longitude]).addTo(map)
         .bindPopup(`
-          <h2>Station: ${station.AddressInfo.Title}</h2>
-          ${station.AddressInfo.AddressLine1 ? `<p>Address: ${station.AddressInfo.AddressLine1}</p>` : ''}
-          ${station.AddressInfo.Town ? `<p>Town: ${station.AddressInfo.Town}</p>` : ''}
-          ${station.AddressInfo.StateOrProvince ? `<p>State/Province: ${station.AddressInfo.StateOrProvince}</p>` : ''}
-          ${station.AddressInfo.Postcode ? `<p>Postcode: ${station.AddressInfo.Postcode}</p>` : ''}
-          <p>Number of Stations/Bays: ${station.NumberOfPoints}</p>
-          <p>Operational Status: ${station.StatusType ? (station.StatusType.IsOperational ? 'Operational' : 'Non Operational') : 'Unknown'}</p>
-          <p>Usage: ${station.UsageType ? station.UsageType.Title : 'Unknown'}</p>
-          <a href="https://www.google.com/maps?q=${station.AddressInfo.Latitude},${station.AddressInfo.Longitude}" target="_blank">Navigate</a>
-        `);
+<h2>Station: ${station.AddressInfo.Title}</h2>
+${station.AddressInfo.AddressLine1 ? `<p>Address: ${station.AddressInfo.AddressLine1}</p>` : ''}
+${station.AddressInfo.Town ? `<p>Town: ${station.AddressInfo.Town}</p>` : ''}
+${station.AddressInfo.StateOrProvince ? `<p>State/Province: ${station.AddressInfo.StateOrProvince}</p>` : ''}
+${station.AddressInfo.Postcode ? `<p>Postcode: ${station.AddressInfo.Postcode}</p>` : ''}
+<p>Number of Stations/Bays: ${station.NumberOfPoints}</p>
+<p>Operational Status: ${station.StatusType ? (station.StatusType.IsOperational ? 'Operational' : 'Non Operational') :
+            'Unknown'}</p>
+<p>Usage: ${station.UsageType ? station.UsageType.Title : 'Unknown'}</p>
+<a href="https://www.google.com/maps?q=${station.AddressInfo.Latitude},${station.AddressInfo.Longitude}"
+  target="_blank">Navigate</a>
+`);
     });
   }
+
+  let timePeriodSelect = document.querySelector('.timePeriod');
+  let energyGenerationElements = document.querySelectorAll('.energyGeneration');
+
+  timePeriodSelect.addEventListener('change', function () {
+    let selectedTimePeriod = this.value;
+
+    energyGenerationElements.forEach(function (element) {
+      element.classList.add('hidden');
+    });
+
+    let selectedEnergyGenerationElement;
+    if (selectedTimePeriod === 'monthly') {
+      selectedEnergyGenerationElement = energyGenerationElements[0];
+    } else if (selectedTimePeriod === 'weekly') {
+      selectedEnergyGenerationElement = energyGenerationElements[1];
+    } else if (selectedTimePeriod === 'daily') {
+      selectedEnergyGenerationElement = energyGenerationElements[2];
+    }
+
+    if (selectedEnergyGenerationElement) {
+      selectedEnergyGenerationElement.classList.remove('hidden');
+    }
+  });
 });

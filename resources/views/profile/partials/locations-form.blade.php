@@ -1,4 +1,4 @@
-<section class="space-y-6">
+<section class="space-y-6 py-6">
   <header>
     <h2 class="text-lg font-medium text-gray-900 dark:text-gray-100">
       {{ __('Manage Your Locations') }}
@@ -8,23 +8,41 @@
       {{ __('View and edit new or existing locations') }}
     </p>
 
-    <div class="mt-6">
-      <div>
-        <div class="mb-5">
-          <h1 class="mb-4 font-semibold">View your locations</h1>
-          <a href="{{ route('locations.userLocations') }}"
-            class="inline-block bg-black text-white py-2 px-4 rounded-lg">
-            View your locations
-          </a>
-        </div>
+    <a href="{{ route('locations.create') }}"
+      class="mt-3 inline-flex items-center px-4 py-2 border border-transparent text-sm leading-5 font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-500 focus:outline-none focus:border-indigo-700 focus:shadow-outline-indigo active:bg-indigo-700 transition ease-in-out duration-150">
+      {{ __('Set up a new location') }}
+    </a>
+  </header>
+  </header>
 
-        <div class="mb-5">
-          <h1 class="mb-4 font-semibold">Set up a new location</h1>
-          <a href="{{ route('locations.create') }}"
-            class="inline-block bg-black text-white py-2 px-4 rounded-lg">
-            Set up new location
-          </a>
+  @forelse($locations as $location)
+    @if (!$location->deleted)
+      <div class="border rounded-xl w-full">
+        @if (auth()->user()->active_MPRN == $location->MPRN)
+          <h3 class="w-full border-b px-6 py-2">Active</h3>
+        @else
+        @endif
+        <h3 class="font-semibold px-6 mt-2">{{ $location->MPRN }} </h3>
+        <h3 class="px-6 mt-2">User: {{ Auth::user()->name }}</h3>
+        <h3 class="px-6 mt-2">Address: {{ $location->address }}</h3>
+        <h3 class="px-6 mt-2">EirCode: <span class="font-semibold">{{ $location->EirCode }}</span></h3>
+        <div class="flex px-6 mt-2">
+          <form method="POST" action="{{ route('locations.destroy', $location->MPRN) }}">
+            @csrf
+            @method('DELETE')
+            <button type="submit" class="mt-3 mr-6 text-black hover:text-gray-500">Delete</button>
+          </form>
+
+          @if (auth()->user()->active_MPRN != $location->MPRN)
+            <form method="POST" action="{{ route('setActiveLocation', $location->MPRN) }}">
+              @csrf
+              <button type="submit" class="mt-3">Make Active</button>
+            </form>
+          @endif
         </div>
       </div>
-  </header>
+    @endif
+  @empty
+    <h4>No Locations found!</h4>
+  @endforelse
 </section>

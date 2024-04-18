@@ -15,83 +15,108 @@
     rel="stylesheet">
   <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
   <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+  <script src="https://d3js.org/d3.v6.js"></script>
 
   @vite(resource_path('css/app.css'))
   @vite(resource_path('js/app.js'))
+  @vite(resource_path('js/carChargingChart/chargingChart.js'))
 </head>
 
 <body class="font-sans bg-background">
   <div class="grid grid-cols-20 gap-6">
-    <div class="col-span-4 bg-white px-10 pt-10 h-screen rounded-l-3xl">
+    <div class="relative my-4 w-56 md:hidden">
+      <input class="peer hidden" type="checkbox" name="select-1" id="select-1" />
+      <label for="select-1"
+        class="flex w-full cursor-pointer select-none rounded-lg border p-2 px-3 text-sm text-gray-700 ring-blue-700 peer-checked:ring">Dashboards
+      </label>
+      <svg xmlns="http://www.w3.org/2000/svg"
+        class="pointer-events-none absolute right-0 top-3 ml-auto mr-5 h-4 text-slate-700 transition peer-checked:rotate-180"
+        fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+      </svg>
+      <ul
+        class="max-h-0 select-none flex-col overflow-hidden rounded-b-lg shadow-md transition-all duration-300 peer-checked:max-h-56 peer-checked:py-3">
+        <li class="cursor-pointer px-3 py-2 text-sm text-slate-600 hover:bg-blue-700 hover:text-white">
+          <a href="{{ route('solar.dashboard') }}">Solar dashboard</a>
+        </li>
+        <li class="cursor-pointer px-3 py-2 text-sm text-slate-600 hover:bg-blue-700 hover:text-white">
+          <a href="{{ route('electricity.dashboard') }}">Electricity usage</a>
+        </li>
+        <li class="cursor-pointer px-3 py-2 text-sm text-slate-600 hover:bg-blue-700 hover:text-white">
+          <a href="{{ route('carCharging.dashboard') }}">EV charging</a>
+        </li>
+        <li class="cursor-pointer px-3 py-2 text-sm text-slate-600 hover:bg-blue-700 hover:text-white">
+          <a href="{{ route('chargingStations.dashboard') }}">Charging locations</a>
+        </li>
+      </ul>
+    </div>
+
+    <div class="col-span-4 bg-white px-6 lg:px-10 pt-10 h-screen rounded-l-3xl hidden md:block">
       <div class="flex justify-center border-b pb-5">
-        <img src="/images/Solar-icon.png" alt="">
-        <h1 class="text-3xl pl-4 font-medium">Dashboard</h1>
+        <img src="/images/Solar-icon.png" alt="" class="lg:block hidden">
+        <h1 class="sm:text-base lg:text-2xl pl-4 font-semibold">Dashboard</h1>
         {{-- <button class="modeToggler text-tableHeadingText ml-auto">
         <img id="modeIcon" src="/images/Light-mode.png" alt="" style="width: 30px; height: 30px;">
       </button> --}}
       </div>
 
-      <div class="my-12">
-        <p class="text-md font-light">Dashboards</p>
-      </div>
+      <h1 class="text-base my-10 underline font-semibold">Dashboards</h1>
 
-      <ul>
-        @include('layouts.dashboardlinks')
+      <ul class="menu">
+        @include('../layouts/dashboardlinks')
       </ul>
 
-      <div class="mt-28 mb-10">
-        <p class="text-md font-light">Other</p>
-      </div>
+      <h1 class="text-base my-10 underline font-semibold">Other</h1>
 
-      <ul>
-        @include('layouts.otherlinks')
-      </ul>
+      <div>
+        <ul>
+          @include('../layouts/otherlinks')
+        </ul>
+      </div>
 
       <x-logout-modal />
     </div>
-    <div class="col-span-10 mt-10 bg-white h-fit rounded-xl">
-      <table class="w-full text-sm text-left rounded-xl overflow-hidden">
-        <!-- Table Header -->
-        <thead class="text-xs uppercase bg-tableHeadingBG">
-          <tr>
-            <th scope="col" class="px-6 py-3 text-tableHeadingText">
-              Start Time
-            </th>
-            <th scope="col" class="px-6 py-3 text-tableHeadingText">
-              End Time
-            </th>
-            <th scope="col" class="px-6 py-3 text-tableHeadingText">
-              Charging Amount (kwh)
-            </th>
-            <th scope="col" class="px-6 py-3 text-tableHeadingText">
-              Action
-            </th>
-          </tr>
-        </thead>
 
-        <!-- Table Body -->
-        @forelse($carChargings as $carCharging)
-          <tr class="bg-tableRowBG">
-            <td scope="row" class="px-6 py-4 font-bold text-tableRowText whitespace-nowrap">
-              {{ $carCharging->start_time }}
-            </td>
-            <td class="px-6 py-4 text-tableRowText">
-              {{ $carCharging->end_time }}
-            </td>
-            <td class="px-6 py-4 text-tableRowText">
-              {{ $carCharging->charging_amount }}
-            </td>
-            <td class="px-6 pt-4">
-              <!-- Link to the show page for the car charging -->
-              <a href="{{ route('carCharging.show', $carCharging->id) }}"
-                class="text-blue-500 hover:text-blue-700 underline">View</a>
-            </td>
-          </tr>
-        @empty
-          <!-- Displayed when no car chargings are found -->
-          <h4>No Car Chargings found!</h4>
-        @endforelse
-      </table>
+    <div class="col-span-20 md:col-span-12 xl:col-span-10 max-h-screen mx-4 mt-4">
+      <div class="sm:-mx-6 lg:-mx-8 bg-white rounded-xl mb-6">
+        <div class="spy-2 sm:px-6 lg:px-8">
+            <table class="min-w-full text-left text-sm font-light dark:text-white">
+              <thead class="border-b border-neutral-200 font-medium dark:border-white/10">
+                <tr>
+                  <th scope="col" class="px-6 py-4">Start time</th>
+                  <th scope="col" class="px-6 py-4">End time</th>
+                  <th scope="col" class="px-6 py-4">Charging Duration</th>
+                  <th scope="col" class="px-6 py-4">Charging amount (kWh)</th>
+                  <th scope="col" class="px-6 py-4">Location MRPN</th>
+                </tr>
+              </thead>
+              <tbody>
+                @forelse($recentCarChargings as $recentCarCharging)
+                  <tr
+                    class="border-b border-neutral-200 transition duration-300 ease-in-out hover:bg-neutral-100 dark:border-white/10 dark:hover:bg-neutral-600">
+                    <td class=" px-6 py-4 font-medium">{{ $recentCarCharging->start_time }}</td>
+                    <td class=" px-6 py-4">{{ $recentCarCharging->end_time }}</td>
+                    <td class=" px-6 py-4">
+                      {{ \Carbon\Carbon::parse($recentCarCharging->end_time)->diffInMinutes(\Carbon\Carbon::parse($recentCarCharging->start_time)) }}
+                    </td>
+                    <td class=" px-6 py-4">{{ $recentCarCharging->charging_amount }}</td>
+                    <td class=" px-6 py-4">{{ $recentCarCharging->location_MPRN }}</td>
+                  @empty
+                    <!-- Displayed when no car chargings are found -->
+                    <h4>No Car Chargings found!</h4>
+                @endforelse
+              </tbody>
+            </table>
+        </div>
+      </div>
+
+      <div class="bg-white p-8 rounded-3xl sm:-mx-6 lg:-mx-8">
+        <div class="flex items-center justify-between mb-6">
+          <h1 class="text-lg md:text-xl lg:text-2xl xl:text-3xl">Total car charging energy by day</h1>
+        </div>
+
+        <div class="bg-gray-100 chargingChart rounded-xl"></div>
+      </div>
     </div>
   </div>
 </body>

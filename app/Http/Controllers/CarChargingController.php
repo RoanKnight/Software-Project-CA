@@ -57,20 +57,44 @@ class CarChargingController extends Controller
     return redirect()->route('carCharging.index')->with('status', 'Failed to create charging station for active location');
   }
 
+  public function getChargingData()
+  {
+    // Fetch the active location MPRN from the User model
+    $activeLocationMPRN = auth()->user()->active_MPRN;
+
+    // Find the location with the active MPRN
+    $location = Location::where('MPRN', $activeLocationMPRN)->first();
+
+    if (!$location) {
+      return response()->json(['error' => 'No active location found.'], 404);
+    }
+
+    // Fetch the charging data for the active location
+    $chargingData = CarCharging::where('location_MPRN', $activeLocationMPRN)->get();
+
+    return response()->json($chargingData);
+  }
+
   public function dashboard()
   {
     $user = auth()->user();
     $activeLocation = Location::where('MPRN', $user->active_MPRN)->first();
 
     $carChargings = collect();
+    $recentCarChargings = collect();
 
     if ($activeLocation) {
       $carChargings = CarCharging::where('location_MPRN', $activeLocation->MPRN)->get();
+      $recentCarChargings = CarCharging::where('location_MPRN', $activeLocation->MPRN)
+        ->latest()
+        ->take(7)
+        ->get();
     }
 
     return view('carCharging.dashboard', [
       'user' => $user,
       'carChargings' => $carChargings,
+      'recentCarChargings' => $recentCarChargings,
       'activeLocation' => $activeLocation,
     ]);
   }
@@ -79,7 +103,7 @@ class CarChargingController extends Controller
   {
     $carCharging = CarCharging::find($id);
     return view('carCharging.show', [
-      'carCharging' => $carCharging
+      'carCharging' => $carCharging,
     ]);
   }
 }

@@ -24,49 +24,47 @@
         </button>
       </div>
     </header>
-    <div class="container mx-auto mt-10 px-4">
-      <div class="relative">
-        <form action="{{ route('locations.store') }}" method="post">
+    <div class="container mx-auto pt-10">
+      <div class="mx-auto max-w-xl">
+        <h1 class="font-bold text-gray-900 not-italic text-2xl text-center">
+          Create a New Location
+        </h1>
+
+        <form action="{{ route('locations.store') }}" method="post"
+          class="bg-white shadow rounded px-8 pt-6 pb-8 mb-4 mt-4">
           @csrf
-          <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <div class="mb-4">
-              <label class="block text-gray-700 text-sm font-bold mb-2">MPRN</label>
-              <span class="text-red-500 text-xs">{{ $errors->first('MPRN') }}</span>
-              <input
-                class="appearance-none rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                placeholder="Location's MPRN...." type="text" name="MPRN" id="MPRN"
-                value="{{ old('MPRN') }}" />
-            </div>
 
-            <div class="mb-4">
-              <label class="block text-gray-700 text-sm font-bold mb-2">Address</label>
-              <span class="text-red-500 text-xs">{{ $errors->first('address') }}</span>
-              <input
-                class="appearance-none rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                placeholder="Location's address...." type="text" name="address" id="address"
-                value="{{ old('address') }}" />
+          @foreach (['MPRN', 'address', 'EirCode'] as $field)
+            <div class="flex flex-wrap -mx-3 mb-6">
+              <div class="w-full px-3">
+                <div class="flex justify-between">
+                  <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"
+                    for="{{ $field }}">
+                    {{ $field }}
+                  </label>
+                  <p class="text-red-500 text-xs italic">{{ $errors->first($field) }}</p>
+                </div>
+                <input
+                  class="appearance-none block w-full bg-gray-200 text-gray-700 border {{ $errors->has($field) ? 'border-red-500' : 'border-gray-200' }} rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white"
+                  id="{{ $field }}" type="text" name="{{ $field }}"
+                  placeholder="Location's {{ $field }}...." value="{{ old($field) }}">
+              </div>
             </div>
+          @endforeach
 
-            <div class="mb-4">
-              <label class="block text-gray-700 text-sm font-bold mb-2">EirCode</label>
-              <span class="text-red-500 text-xs">{{ $errors->first('EirCode') }}</span>
-              <input
-                class="appearance-none rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                placeholder="Location's EirCode...." type="text" name="EirCode" id="EirCode"
-                value="{{ old('EirCode') }}" />
+          @if (auth()->user()->locations->isEmpty())
+            <div class="alert alert-warning text-center mb-10">
+              You need to add a location for this application.
             </div>
+          @else
+          @endif
 
-            <div class="mb-4">
-              <label class="block text-gray-700 text-sm font-bold mb-2">User ID</label>
-              <span class="text-red-500 text-xs">{{ $errors->first('user_id') }}</span>
-              <input
-                class="appearance-none rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                placeholder="Location's User ID...." type="text" name="user_id" id="user_id"
-                value="{{ old('user_id') }}" />
-            </div>
-
-            <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" type="submit">Create
-              Location</button>
+          <div class="flex justify-between items-center mb-6">
+            <button
+              class="bg-indigo-700 h-12 hover:shadow hover:bg-indigo-500 text-white font-bold px-4 rounded focus:outline-none focus:shadow-outline"
+              type="submit">
+              Create Location
+            </button>
           </div>
         </form>
       </div>

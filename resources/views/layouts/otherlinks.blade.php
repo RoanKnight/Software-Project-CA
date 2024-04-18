@@ -16,11 +16,11 @@
 @endphp
 
 @foreach ($otherLinks as $link)
-  <li class="mb-10 px-4 py-3 {{ Route::currentRouteName() == $link['route'] ? '' : '' }}">
-    <a href="{{ route($link['route']) }}" class="flex hover:underline"
+  <li class="mb-10 py-3">
+    <a href="{{ route($link['route']) }}" class="flex items-center hover:underline"
       @if (isset($link['onclick'])) onclick="{{ $link['onclick'] }}" @endif>
-      <img src="{{ $link['image'] }}" alt="" style="width: 25px; height: 25px">
-      <h3 class="text-xl font-normal ml-5">{{ $link['title'] }}</h3>
+      <img src="{{ $link['image'] }}" alt="" style="width: 20px; height: 20px">
+      <h3 class="ml-2 lg:ml-5 text-xs lg:text-lg font-semibold">{{ $link['title'] }}</h3>
     </a>
   </li>
 @endforeach

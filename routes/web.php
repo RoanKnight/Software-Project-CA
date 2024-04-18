@@ -9,7 +9,7 @@ use App\Http\Controllers\LocationController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
-  return view('welcome');
+  return redirect()->route('register');
 });
 
 Route::get('/example', function () {
@@ -84,6 +84,7 @@ Route::prefix('carCharging')->group(function () {
   Route::get('/', [CarChargingController::class, 'index'])->name('carCharging.index');
   Route::get('/location-car-charging', [CarChargingController::class, 'LocationsCarChargings'])->name('carCharging.locationCarCharging');
   Route::post('/', [CarChargingController::class, 'store'])->name('carCharging.store');
+  Route::get('/get-charging-data', [CarChargingController::class, 'getChargingData'])->name('carCharging.getChargingData');
   Route::get('/dashboard', [CarChargingController::class, 'dashboard'])->name('carCharging.dashboard');
   Route::get('/{id}', [CarChargingController::class, 'show'])->name('carCharging.show');
 });

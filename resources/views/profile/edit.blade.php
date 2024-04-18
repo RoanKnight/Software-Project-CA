@@ -89,13 +89,15 @@
         @endif
 
         <div class="locations form-content">
-          @include('../../locations/user-locations')
+          @include('profile.partials.locations-form')
         </div>
 
         <div class="solar-panels form-content">
+          @include('profile.partials.solar-form')
         </div>
 
         <div class="electricity-usage form-content">
+          @include('profile.partials.electricity-form')
         </div>
 
         <div class="car-chargings form-content">

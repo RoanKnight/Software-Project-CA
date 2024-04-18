@@ -182,14 +182,28 @@ class SolarPanelController extends Controller
 
     $location = 'Dún Laoghaire, IE';
     $weather = $this->weatherService->getCurrentWeather($location);
-    $tomorrowWeather = $this->weatherService->getTomorrowWeather($location);
+    $forecast = $this->weatherService->getForecast($location);
+
+    $forecastByDay = [];
+    $today = date('Y-m-d');
+    foreach ($forecast['list'] as $item) {
+      $date = date('Y-m-d', $item['dt']);
+      if ($date > $today) {
+        if (!isset($forecastByDay[$date])) {
+          $forecastByDay[$date] = [
+            'temp' => round($item['main']['temp'] - 273.15),
+            'icon' => $item['weather'][0]['icon'],
+          ];
+        }
+      }
+    }
 
     return view('solar.dashboard', [
       'user' => $user,
       'solarPanels' => $solarPanels,
       'locations' => $locations,
       'weather' => $weather,
-      'tomorrowWeather' => $tomorrowWeather,
+      'forecastByDay' => $forecastByDay
     ]);
   }
 
