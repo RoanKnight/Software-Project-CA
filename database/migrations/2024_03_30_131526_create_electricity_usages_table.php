@@ -16,7 +16,7 @@ return new class extends Migration
             $table->timestamps();
             $table->string('location_MPRN');
 
-            $table->foreign('location_MPRN')->references('MPRN')->on('locations');
+            $table->foreign('location_MPRN')->references('MPRN')->on('locations')->onDelete('cascade');
             
             $table->boolean('deleted')->default(false);
         });

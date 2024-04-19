@@ -1,4 +1,5 @@
 <?php
+// Importing necessary controllers
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\SolarPanelController;
 use App\Http\Controllers\ElectricityUsageController;
@@ -8,34 +9,42 @@ use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\LocationController;
 use Illuminate\Support\Facades\Route;
 
+// Redirecting the root route to the registration page
 Route::get('/', function () {
   return redirect()->route('register');
 });
 
+// Route for example page
 Route::get('/example', function () {
   return view('example');
 });
 
+// Dashboard route, requires authentication and email verification
 Route::get('/dashboard', function () {
   return view('dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
 
+// Grouping routes that require authentication
 Route::middleware('auth')->group(function () {
+  // Profile routes
   Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
   Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
   Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
+// Grouping user-related routes
 Route::prefix('users')->group(function () {
   Route::get('/', [RegisteredUserController::class, 'index'])->name('users.index');
   Route::get('/{user}', [RegisteredUserController::class, 'show'])->name('users.show');
   Route::post('/{user}/promote', [RegisteredUserController::class, 'promoteToAdmin'])->name('users.promote');
   Route::delete('/{user}', [RegisteredUserController::class, 'destroy'])->name('users.destroy');
-  Route::match(['post', 'patch'], '/{user}/restore', [RegisteredUserController::class, 'restore'])
+  Route::match (['post', 'patch'], '/{user}/restore', [RegisteredUserController::class, 'restore'])
     ->name('users.restore');
 });
 
+// Grouping location-related routes
 Route::prefix('locations')->group(function () {
+  // Location CRUD routes
   Route::get('/', [LocationController::class, 'index'])->name('locations.index');
   Route::get('/user-locations', [LocationController::class, 'userLocations'])->name('locations.userLocations');
   Route::get('/create', [LocationController::class, 'create'])->name('locations.create');
@@ -46,7 +55,9 @@ Route::prefix('locations')->group(function () {
   Route::patch('/{MPRN}/restore', [LocationController::class, 'restore'])->name('locations.restore');
 });
 
+// Grouping solar panel related routes
 Route::prefix('solar')->group(function () {
+  // Solar panel routes
   Route::get('/', [SolarPanelController::class, 'index'])->name('solar.index');
   Route::get('/create', [SolarPanelController::class, 'create'])->name('solar.create');
   Route::post('/', [SolarPanelController::class, 'store'])->name('solar.store');
@@ -58,7 +69,9 @@ Route::prefix('solar')->group(function () {
   Route::patch('/{solarPanel}/restore', [SolarPanelController::class, 'restore'])->name('solar.restore');
 });
 
+// Grouping electricity usage related routes
 Route::prefix('electricity')->group(function () {
+  // Electricity usage routes
   Route::get('/', [ElectricityUsageController::class, 'index'])->name('electricity.index');
   Route::get('/create', [ElectricityUsageController::class, 'create'])->name('electricity.create');
   Route::post('/', [ElectricityUsageController::class, 'store'])->name('electricity.store');
@@ -70,7 +83,9 @@ Route::prefix('electricity')->group(function () {
   Route::patch('/{electricityUsage}/restore', [ElectricityUsageController::class, 'restore'])->name('electricity.restore');
 });
 
+// Grouping charging station related routes
 Route::prefix('chargingStations')->group(function () {
+  // Charging station routes
   Route::get('/', [ChargingStationController::class, 'index'])->name('chargingStations.index');
   Route::get('/create', [ChargingStationController::class, 'create'])->name('chargingStations.create');
   Route::post('/', [ChargingStationController::class, 'store'])->name('chargingStations.store');
@@ -80,7 +95,9 @@ Route::prefix('chargingStations')->group(function () {
   Route::patch('/{chargingStation}/restore', [ChargingStationController::class, 'restore'])->name('chargingStations.restore');
 });
 
+// Grouping car charging related routes
 Route::prefix('carCharging')->group(function () {
+  // Car charging routes
   Route::get('/', [CarChargingController::class, 'index'])->name('carCharging.index');
   Route::get('/location-car-charging', [CarChargingController::class, 'LocationsCarChargings'])->name('carCharging.locationCarCharging');
   Route::post('/', [CarChargingController::class, 'store'])->name('carCharging.store');
@@ -89,4 +106,5 @@ Route::prefix('carCharging')->group(function () {
   Route::get('/{id}', [CarChargingController::class, 'show'])->name('carCharging.show');
 });
 
+// Including authentication routes
 require __DIR__ . '/auth.php';

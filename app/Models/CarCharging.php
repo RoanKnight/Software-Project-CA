@@ -7,17 +7,19 @@ use Illuminate\Database\Eloquent\Model;
 
 class CarCharging extends Model
 {
-  use HasFactory;
+    use HasFactory;
 
-  protected $fillable = [
-    'start_time',
-    'end_time',
-    'charging_amount',
-    'location_MPRN'
-  ];
+    // The attributes that are mass assignable
+    protected $fillable = [
+        'start_time',
+        'end_time',
+        'charging_amount',
+        'location_MPRN'
+    ];
 
-  public function location()
-  {
-    return $this->belongsTo(Location::class, 'location_MPRN', 'MPRN');
-  }
+    // Define a relationship: car charging record belongs to a location
+    public function location()
+    {
+        return $this->belongsTo(Location::class, 'location_MPRN', 'MPRN');
+    }
 }

@@ -7,6 +7,7 @@
   <meta name="csrf-token" content="{{ csrf_token() }}">
 
   <title>{{ config('app.name', 'Laravel') }}</title>
+
   <link rel="preconnect" href="https://fonts.bunny.net">
   <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
 
@@ -17,6 +18,8 @@
 <body class="font-sans antialiased bg-background">
   <div class="min-h-screen">
     @include('layouts.navigation')
+
+    <!-- Header -->
     <header>
       <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
         <button class="modeToggler bg-background text-tableHeadingText">
@@ -24,9 +27,11 @@
         </button>
       </div>
     </header>
+
     <div class="container mx-auto mt-10 px-4">
       <div class="relative overflow-x-auto shadow-md sm:rounded-lg">
         <table class="w-full text-sm text-left">
+
           <!-- Table Header -->
           <thead class="text-xs uppercase bg-tableHeadingBG">
             <tr>
@@ -70,13 +75,15 @@
               </td>
               <td class="px-6 py-4">
                 <!-- Link to the show page for the user -->
-                <a href="{{ route('users.show', $user->id) }}" class="text-blue-500 hover:text-blue-700 underline">View</a>
+                <a href="{{ route('users.show', $user->id) }}"
+                  class="text-blue-500 hover:text-blue-700 underline">View</a>
               </td>
             </tr>
           @empty
             <!-- Displayed when no users are found -->
             <h4>No Users found!</h4>
           @endforelse
+
         </table>
       </div>
     </div>
@@ -87,6 +94,7 @@
       {{ session('status') }}
     </div>
   @endif
+
 </body>
 
 </html>

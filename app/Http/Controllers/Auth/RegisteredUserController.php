@@ -16,32 +16,29 @@ use Illuminate\View\View;
 
 class RegisteredUserController extends Controller
 {
-
+  // Constructor to set middleware for routes
   public function __construct()
   {
+    // Middleware to require authentication for all methods except create and store
     $this->middleware('auth', ['except' => ['create', 'store']]);
-    $this->middleware('role:admin', ['only' => ['promote', 'delete', 'restore', 'index']]);
+    // Middleware to restrict access to admin-related methods to users with 'admin' role
+    $this->middleware('role:admin', ['only' => ['promoteToAdmin', 'destroy', 'restore', 'index']]);
   }
 
-  public function index()
+  // Display a list of all registered users
+  public function index(): View
   {
     $users = User::all();
-
-    return view('users.index', [
-      'users' => $users,
-    ]);
+    return view('users.index', ['users' => $users]);
   }
 
+  // Show the registration form
   public function create(): View
   {
     return view('auth.register');
   }
 
-  /**
-   * Handle an incoming registration request.
-   *
-   * @throws \Illuminate\Validation\ValidationException
-   */
+  // Handle a registration request
   public function store(Request $request): RedirectResponse
   {
     $request->validate([
@@ -57,24 +54,27 @@ class RegisteredUserController extends Controller
       'role' => User::ROLE_USER,
     ]);
 
-    // Use the user's email for the directory
+    // Create a directory for the user using their email address
     $userDirectory = 'users/' . $user->email;
     Storage::makeDirectory($userDirectory);
 
+    // Trigger the Registered event
     event(new Registered($user));
 
+    // Log in the newly registered user
     Auth::login($user);
 
+    // Redirect to the registered user's home page
     return redirect(RouteServiceProvider::REGISTEREDHOME);
   }
 
+  // Display the profile of a specific user
   public function show(User $user): View
   {
-    return view('users.show', [
-      'user' => $user,
-    ]);
+    return view('users.show', ['user' => $user]);
   }
 
+  // Promote a user to admin role
   public function promoteToAdmin(User $user): RedirectResponse
   {
     $user->role = User::ROLE_ADMIN;
@@ -83,6 +83,7 @@ class RegisteredUserController extends Controller
     return redirect()->back()->with('success', 'User promoted to admin successfully');
   }
 
+  // Delete a user
   public function destroy(string $id)
   {
     $user = User::findOrFail($id);
@@ -91,10 +92,10 @@ class RegisteredUserController extends Controller
     return redirect()->route('users.index')->with('status', 'User deleted successfully');
   }
 
+  // Restore a deleted user
   public function restore(string $id)
   {
     $user = User::findOrFail($id);
-
     $user->update(['deleted' => false]);
 
     return redirect()->route('users.index')->with('status', 'User restored successfully');

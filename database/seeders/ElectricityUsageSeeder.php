@@ -1,13 +1,10 @@
 <?php
-
 namespace Database\Seeders;
 
-use App\Models\ElectricityUsage;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
-use App\Models\Location;
-use Illuminate\Support\Facades\Storage;
-use App\Models\User;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Storage;
+use App\Models\ElectricityUsage;
+use App\Models\Location;
 
 class ElectricityUsageSeeder extends Seeder
 {
@@ -22,8 +19,10 @@ class ElectricityUsageSeeder extends Seeder
       ],
     ];
 
+    // Insert electricity usage data into the database
     ElectricityUsage::insert($electricityUsages);
 
+    // Create directories and files for electricity usage data
     foreach ($electricityUsages as $electricityData) {
       $location = Location::where('MPRN', $electricityData['location_MPRN'])->first();
       if ($location) {
@@ -37,3 +36,4 @@ class ElectricityUsageSeeder extends Seeder
     }
   }
 }
+

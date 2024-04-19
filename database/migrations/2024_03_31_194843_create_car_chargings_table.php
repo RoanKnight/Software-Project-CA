@@ -16,6 +16,7 @@ return new class extends Migration {
       $table->timestamp('end_time');
       $table->decimal('charging_amount', 8, 2);
       $table->string('location_MPRN');
+      $table->foreign('location_MPRN')->references('MPRN')->on('locations')->onDelete('cascade');
       $table->timestamps();
     });
   }

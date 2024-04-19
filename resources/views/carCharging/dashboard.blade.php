@@ -77,30 +77,30 @@
       <x-logout-modal />
     </div>
 
-    <div class="col-span-20 md:col-span-12 xl:col-span-10 max-h-screen mx-4 mt-4">
+    <div class="col-span-20 md:col-span-16 xl:col-span-10 max-h-screen mx-4 mt-4">
       <div class="sm:-mx-6 lg:-mx-8 bg-white rounded-xl mb-6">
         <div class="spy-2 sm:px-6 lg:px-8">
             <table class="min-w-full text-left text-sm font-light dark:text-white">
               <thead class="border-b border-neutral-200 font-medium dark:border-white/10">
                 <tr>
-                  <th scope="col" class="px-6 py-4">Start time</th>
-                  <th scope="col" class="px-6 py-4">End time</th>
-                  <th scope="col" class="px-6 py-4">Charging Duration</th>
-                  <th scope="col" class="px-6 py-4">Charging amount (kWh)</th>
-                  <th scope="col" class="px-6 py-4">Location MRPN</th>
+                  <th scope="col" class="px-2 md:px-6 py-4 text-xs md:text-sm">Start time</th>
+                  <th scope="col" class="px-2 md:px-6 py-4 text-xs md:text-sm">End time</th>
+                  <th scope="col" class="px-2 md:px-6 py-4 text-xs md:text-sm">Charging Duration</th>
+                  <th scope="col" class="px-2 md:px-6 py-4 text-xs md:text-sm">Charging amount (kWh)</th>
+                  <th scope="col" class="px-2 md:px-6 py-4 text-xs md:text-sm">Location MRPN</th>
                 </tr>
               </thead>
               <tbody>
                 @forelse($recentCarChargings as $recentCarCharging)
                   <tr
                     class="border-b border-neutral-200 transition duration-300 ease-in-out hover:bg-neutral-100 dark:border-white/10 dark:hover:bg-neutral-600">
-                    <td class=" px-6 py-4 font-medium">{{ $recentCarCharging->start_time }}</td>
-                    <td class=" px-6 py-4">{{ $recentCarCharging->end_time }}</td>
-                    <td class=" px-6 py-4">
+                    <td class="px-2 md:px-6 py-4 text-xs md:text-sm font-medium">{{ $recentCarCharging->start_time }}</td>
+                    <td class="px-2 md:px-6 py-4 text-xs md:text-sm">{{ $recentCarCharging->end_time }}</td>
+                    <td class="px-2 md:px-6 py-4 text-xs md:text-sm">
                       {{ \Carbon\Carbon::parse($recentCarCharging->end_time)->diffInMinutes(\Carbon\Carbon::parse($recentCarCharging->start_time)) }}
                     </td>
-                    <td class=" px-6 py-4">{{ $recentCarCharging->charging_amount }}</td>
-                    <td class=" px-6 py-4">{{ $recentCarCharging->location_MPRN }}</td>
+                    <td class="px-2 md:px-6 py-4 text-xs md:text-sm">{{ $recentCarCharging->charging_amount }}</td>
+                    <td class="px-2 md:px-6 py-4 text-xs md:text-sm">{{ $recentCarCharging->location_MPRN }}</td>
                   @empty
                     <!-- Displayed when no car chargings are found -->
                     <h4>No Car Chargings found!</h4>

@@ -14,6 +14,7 @@ class UserSeeder extends Seeder
    */
   public function run(): void
   {
+    // Create an admin user
     $admin = new User;
     $admin->name = "Roan Knight";
     $admin->email = "roanknight21@gmail.com";
@@ -21,11 +22,13 @@ class UserSeeder extends Seeder
     $admin->role = 'admin';
     $admin->save();
 
+    // Create a directory for the admin user
     $adminDirectory = 'users/' . $admin->email;
     if (!Storage::exists($adminDirectory)) {
       Storage::makeDirectory($adminDirectory);
     }
 
+    // Create a regular user
     $user = new User;
     $user->name = "John Jones";
     $user->email = "user@example.com";
@@ -33,6 +36,7 @@ class UserSeeder extends Seeder
     $user->role = 'user';
     $user->save();
 
+    // Create a directory for the regular user
     $userDirectory = 'users/' . $user->email;
     if (!Storage::exists($userDirectory)) {
       Storage::makeDirectory($userDirectory);

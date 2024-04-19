@@ -2,12 +2,11 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
-use App\Models\SolarPanel;
+use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Storage;
+use App\Models\SolarPanel;
 use App\Models\User;
 use App\Models\Location;
-use Illuminate\Database\Seeder;
 
 class SolarPanelSeeder extends Seeder
 {
@@ -22,8 +21,10 @@ class SolarPanelSeeder extends Seeder
       ],
     ];
 
+    // Insert solar panel data into the database
     SolarPanel::insert($solarPanels);
 
+    // Create directories and files for solar panel data
     foreach ($solarPanels as $solarData) {
       $location = Location::where('MPRN', $solarData['location_MPRN'])->first();
       if ($location) {
@@ -37,3 +38,5 @@ class SolarPanelSeeder extends Seeder
     }
   }
 }
+
+

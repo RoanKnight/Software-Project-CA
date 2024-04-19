@@ -10,6 +10,7 @@
   </svg>
   <ul
     class="max-h-0 select-none flex-col overflow-hidden rounded-b-lg shadow-md transition-all duration-300 peer-checked:max-h-56 peer-checked:py-3">
+    <!-- Dashboard links -->
     <li class="cursor-pointer px-3 py-2 text-sm text-slate-600 hover:bg-blue-700 hover:text-white">
       <a href="{{ route('solar.dashboard') }}">Solar dashboard</a>
     </li>
@@ -26,6 +27,7 @@
 </div>
 
 <div class="col-span-4 bg-white px-6 lg:px-10 pt-10 min-h-screen rounded-l-3xl hidden md:block">
+  <!-- Header -->
   <div class="flex justify-center border-b pb-5">
     <img src="/images/Solar-icon.png" alt="" class="lg:block hidden">
     <h1 class="sm:text-base lg:text-2xl pl-4 font-semibold">Dashboard</h1>
@@ -34,19 +36,22 @@
   </button> --}}
   </div>
 
+  <!-- Section for Dashboards -->
   <h1 class="text-base my-10 underline font-semibold">Dashboards</h1>
-
   <ul class="menu">
+    <!-- Include dashboard links -->
     @include('../layouts/dashboardlinks')
   </ul>
 
+  <!-- Section for Other Links -->
   <h1 class="text-base my-10 underline font-semibold">Other</h1>
-
   <div>
     <ul>
+      <!-- Include other links -->
       @include('../layouts/otherlinks')
     </ul>
   </div>
 
+  <!-- Logout Modal Component -->
   <x-logout-modal />
 </div>

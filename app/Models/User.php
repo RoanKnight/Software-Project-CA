@@ -9,8 +9,10 @@ use Laravel\Sanctum\HasApiTokens;
 
 class User extends Authenticatable
 {
+  // Traits used by the User model
   use HasApiTokens, HasFactory, Notifiable;
 
+  // Constants defining user roles
   const ROLE_ADMIN = 'admin';
   const ROLE_USER = 'user';
 
@@ -23,9 +25,9 @@ class User extends Authenticatable
     'name',
     'email',
     'password',
-    'role',
-    'deleted',
-    'active_MPRN' // Add this line
+    'role', // User role (admin or user)
+    'deleted', // Indicates if the user is deleted
+    'active_MPRN' // Indicates the active MPRN (Meter Point Reference Number)
   ];
 
   /**
@@ -34,8 +36,8 @@ class User extends Authenticatable
    * @var array<int, string>
    */
   protected $hidden = [
-    'password',
-    'remember_token',
+    'password', // Hide password field for security reasons
+    'remember_token', // Hide remember token
   ];
 
   /**
@@ -44,25 +46,29 @@ class User extends Authenticatable
    * @var array<string, string>
    */
   protected $casts = [
-    'email_verified_at' => 'datetime',
-    'password' => 'hashed'
+    'email_verified_at' => 'datetime', // Cast email_verified_at to datetime
+    'password' => 'hashed' // Hash the password
   ];
 
+  // Define a relationship: a user can have many locations
   public function locations()
   {
     return $this->hasMany(Location::class);
   }
 
+  // Define a relationship: a user has one active location
   public function activeLocation()
   {
     return $this->hasOne(Location::class, 'MPRN', 'active_MPRN');
   }
 
+  // Check if the user is an admin
   public function isAdmin()
   {
     return $this->role === self::ROLE_ADMIN;
   }
 
+  // Check if the user is a regular user
   public function isUser()
   {
     return $this->role === self::ROLE_USER;

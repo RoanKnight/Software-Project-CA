@@ -11,6 +11,7 @@
 @endsection
 
 @section('content')
+  <!-- Main content section -->
   <div class="container mx-auto px-4 my-10">
     <div class="relative overflow-x-auto shadow-md sm:rounded-lg">
       <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
@@ -30,6 +31,7 @@
             </th>
           </tr>
         </thead>
+        <!-- Table body -->
         <tbody>
           <tr class="bg-white border-b dark:bg-gray-900 dark:border-gray-700">
             <td scope="row" class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
@@ -52,6 +54,8 @@
         </tbody>
       </table>
     </div>
+
+    <!-- Conditional forms -->
     @if (!$user->deleted)
       <form action="{{ route('users.destroy', $user->id) }}" method="POST" class="inline">
         @csrf

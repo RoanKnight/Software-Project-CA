@@ -11,8 +11,6 @@ class LocationSeeder extends Seeder
 {
   /**
    * Run the database seeds.
-   *
-   * @return void
    */
   public function run(): void
   {
@@ -37,8 +35,10 @@ class LocationSeeder extends Seeder
       ],
     ];
 
+    // Insert locations into the database
     Location::insert($locations);
 
+    // Set the active_MPRN for each user to the MPRN of their first location
     $users = User::all();
     foreach ($users as $user) {
       $firstLocation = $user->locations()->first();
@@ -48,6 +48,7 @@ class LocationSeeder extends Seeder
       }
     }
 
+    // Create directories for each location
     foreach ($locations as $locationData) {
       $user = User::find($locationData['user_id']);
       $locationDirectory = 'users/' . $user->email . '/' . str_replace(' ', '_', $locationData['address']);
