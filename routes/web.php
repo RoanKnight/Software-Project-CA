@@ -42,7 +42,6 @@ Route::prefix('users')->group(function () {
     ->name('users.restore');
 });
 
-// Grouping location-related routes
 Route::prefix('locations')->group(function () {
   // Location CRUD routes
   Route::get('/', [LocationController::class, 'index'])->name('locations.index');
@@ -51,9 +50,12 @@ Route::prefix('locations')->group(function () {
   Route::post('/', [LocationController::class, 'store'])->name('locations.store');
   Route::post('/{MPRN}/setActiveLocation', [LocationController::class, 'setActiveLocation'])->name('setActiveLocation');
   Route::get('/{location}', [LocationController::class, 'show'])->name('locations.show');
+  Route::get('/{location}/edit', [LocationController::class, 'edit'])->name('locations.edit');
+  Route::patch('/{location}', [LocationController::class, 'update'])->name('locations.update');
   Route::delete('/{location}', [LocationController::class, 'destroy'])->name('locations.destroy');
   Route::patch('/{MPRN}/restore', [LocationController::class, 'restore'])->name('locations.restore');
 });
+
 
 // Grouping solar panel related routes
 Route::prefix('solar')->group(function () {

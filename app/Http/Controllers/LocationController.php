@@ -120,6 +120,74 @@ class LocationController extends Controller
     return redirect()->route('profile.edit')->with('status', 'Created a new location');
   }
 
+  public function edit(string $MPRN)
+  {
+    $location = Location::findOrFail($MPRN);
+    return view('locations.edit', [
+      'location' => $location,
+    ]);
+  }
+
+  public function update(Request $request, string $MPRN)
+  {
+    $location = Location::findOrFail($MPRN);
+    $request->merge(['EirCode' => str_replace(' ', '', $request->EirCode)]);
+
+    // Validation rules
+    $rules = [
+      'address' => 'required|string|max:255',
+      'EirCode' => [
+        'required',
+        'string',
+        'size:7',
+        'regex:/^[A-Z0-9]+$/',
+        function ($attribute, $value, $fail) use ($location) {
+          // Exclude the current location from the query
+          if (
+            Location::where('EirCode', $value)
+              ->where('user_id', Auth::id())
+              ->where('MPRN', '!=', $location->MPRN)
+              ->exists()
+          ) {
+            $fail('You cannot update the EirCode to one that already exists.');
+          }
+        },
+      ],
+    ];
+
+    // Validation messages
+    $messages = [
+      'address.required' => 'The address field is required.',
+      'address.max' => 'The address field may not be greater than 255 characters.',
+      'EirCode.required' => 'The EirCode field is required.',
+      'EirCode.size' => 'The EirCode field must be exactly 7 characters.',
+      'EirCode.regex' => 'The EirCode field must be in the correct format. eg: D02AB12',
+    ];
+
+    // Validate the request
+    $validatedData = $request->validate($rules, $messages);
+
+    // Update the location
+    $location->fill($validatedData);
+
+    // Update the location directory if the address changes
+    if ($location->isDirty('address')) {
+      $oldDirectory = 'users/' . Auth::user()->email . '/' . str_replace(' ', '_', $location->getOriginal('address'));
+      $newDirectory = 'users/' . Auth::user()->email . '/' . str_replace(' ', '_', $request->address);
+
+      // If the old directory exists, rename it to the new directory
+      if (Storage::exists($oldDirectory)) {
+        Storage::move($oldDirectory, $newDirectory);
+      }
+    }
+
+    // Save the changes to the location
+    $location->save();
+
+    // Redirect back to the index page with a success message
+    return redirect()->route('locations.index')->with('status', 'Location updated successfully');
+  }
+
   // Set the active location for the current authenticated user
   public function setActiveLocation($MPRN)
   {

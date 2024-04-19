@@ -26,17 +26,19 @@
         <h3 class="px-6 mt-2">User: {{ Auth::user()->name }}</h3>
         <h3 class="px-6 mt-2">Address: {{ $location->address }}</h3>
         <h3 class="px-6 mt-2">EirCode: <span class="font-semibold">{{ $location->EirCode }}</span></h3>
-        <div class="flex px-6 mt-2">
-          <form method="POST" action="{{ route('locations.destroy', $location->MPRN) }}">
+        <div class="flex px-6 mt-2 items-center">
+          <form method="POST" action="{{ route('locations.destroy', $location->MPRN) }}" class="mr-4">
             @csrf
             @method('DELETE')
-            <button type="submit" class="mt-3 mr-6 text-black hover:text-gray-500">Delete</button>
+            <button type="submit" class="text-black hover:text-gray-500">Delete</button>
           </form>
+
+          <a href="{{ route('locations.edit', $location->MPRN) }}" class="mr-4">Edit</a>
 
           @if (auth()->user()->active_MPRN != $location->MPRN)
             <form method="POST" action="{{ route('setActiveLocation', $location->MPRN) }}">
               @csrf
-              <button type="submit" class="mt-3">Make Active</button>
+              <button type="submit">Make Active</button>
             </form>
           @endif
         </div>

@@ -51,7 +51,7 @@
           </tr>
         </tbody>
       </table>
-    </div>
+    </div>    
     @if ($location->deleted || $location->user->deleted)
       <form method="POST" action="{{ route('locations.restore', $location->MPRN) }}">
         @csrf
