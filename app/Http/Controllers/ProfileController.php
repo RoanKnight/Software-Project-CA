@@ -18,10 +18,8 @@ class ProfileController extends Controller
    */
   public function edit(Request $request): View
   {
-    // Retrieve locations associated with the authenticated user
     $locations = auth()->user()->locations;
 
-    // Return the 'profile.edit' view with user and location data
     return view('profile.edit', [
       'user' => $request->user(),
       'locations' => $locations,
@@ -33,7 +31,6 @@ class ProfileController extends Controller
    */
   public function update(ProfileUpdateRequest $request): RedirectResponse
   {
-    // Get the current user
     $user = $request->user();
 
     // Update user's profile with validated data
@@ -54,10 +51,8 @@ class ProfileController extends Controller
       $user->email_verified_at = null;
     }
 
-    // Save the updated user profile
     $user->save();
 
-    // Redirect to the profile edit page with a success message
     return Redirect::route('profile.edit')->with('status', 'profile-updated');
   }
 
@@ -66,21 +61,17 @@ class ProfileController extends Controller
    */
   public function destroy(Request $request): RedirectResponse
   {
-    // Validate the password for user deletion
     $request->validateWithBag('userDeletion', [
       'password' => ['required', 'current_password'],
     ]);
 
-    // Retrieve the authenticated user
     $user = $request->user();
 
     // Define the user's directory
     $userDirectory = 'users/' . $user->email;
 
-    // Logout the user
     Auth::logout();
 
-    // Delete the user account
     $user->delete();
 
     // Delete the user's directory
@@ -92,7 +83,6 @@ class ProfileController extends Controller
     $request->session()->invalidate();
     $request->session()->regenerateToken();
 
-    // Redirect to the homepage after account deletion
     return Redirect::to('/');
   }
 }

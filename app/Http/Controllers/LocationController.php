@@ -158,7 +158,6 @@ class LocationController extends Controller
     // Save the changes to the location
     $location->save();
 
-    // Redirect back to the previous page with a success message
     return redirect()->route('profile.edit')->with('status', 'Location updated successfully');
   }
 
