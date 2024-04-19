@@ -83,6 +83,18 @@ export function monthlyChart() {
         };
       });
 
+      let peakUsageMonth = monthlyElectricityConsumption[0].month;
+      let maxEnergy = monthlyElectricityConsumption[0].totalEnergy;
+
+      monthlyElectricityConsumption.forEach(item => {
+        if (item.totalEnergy > maxEnergy) {
+          maxEnergy = item.totalEnergy;
+          peakUsageMonth = item.month;
+        }
+      });
+
+      document.querySelector('.peakUsageTimes').textContent = `Your peak usage month was: ${peakUsageMonth.toLocaleString('default', { month: 'long', year: 'numeric' })}`;
+
       // Calculate total and average energy consumption
       const totalEnergy = monthlyElectricityConsumption.reduce((total, item) => total + item.totalEnergy, 0);
       document.querySelector('.totalEnergy').textContent = totalEnergy.toFixed(2) + " kWh";
@@ -105,8 +117,8 @@ export function monthlyChart() {
         const averageDifference = currentYearAverage - previousYearAverage;
 
         // Determine comparison direction
-        const comparison = totalDifference > 0 ? 'more' : 'less';
-        const colorClass = comparison === 'more' ? 'text-green-500' : 'text-red-500';
+        const comparison = totalDifference > 0 ? 'less' : 'more';
+        const colorClass = comparison === 'more' ? 'text-red-500' : 'text-green-500';
 
         // Display comparison results
         const totalDifferenceElement = `<span class="${colorClass}">${Math.abs(totalDifference.toFixed(2))} kWh</span>`;
@@ -114,6 +126,10 @@ export function monthlyChart() {
 
         const averageDifferenceElement = `<span class="${colorClass}">${Math.abs(averageDifference.toFixed(2))} kWh</span>`;
         document.querySelector('.averageComparison').innerHTML = `${averageDifferenceElement} ${comparison} than last year`;
+
+        const comparisonCost = (totalDifference > 0 && averageDifference > 0) ? 'more' : 'less';
+        const colorClassCost = comparisonCost === 'more' ? 'text-red-500' : 'text-green-500';
+        document.querySelector('.costComparison').innerHTML = `Your electricity cost for today is <span class="${colorClassCost}">€${Math.abs(totalDifference * 0.25).toFixed(2)}</span> ${comparisonCost} than last month`;
       }
 
       // Get the dates for x-axis and total energy consumption for y-axis

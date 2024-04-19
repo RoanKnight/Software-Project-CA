@@ -27,25 +27,25 @@ class Location extends Model
     'user_id'
   ];
 
-  // Define a relationship: a location belongs to a user
+  // A location belongs to a user
   public function user()
   {
     return $this->belongsTo(User::class);
   }
 
-  // Define a relationship: a location can have many solar panels
+  // A location can have many solar panels
   public function solarPanels()
   {
     return $this->hasMany(SolarPanel::class, 'location_MPRN', 'MPRN');
   }
 
-  // Define a relationship: a location can have many electricity usages
+  // A location can have many electricity usages
   public function electricityUsages()
   {
     return $this->hasMany(ElectricityUsage::class, 'location_MPRN', 'MPRN');
   }
 
-  // Define a relationship: a location can have many car chargings
+  // A location can have many car chargings
   public function carChargings()
   {
     return $this->hasMany(CarCharging::class, 'location_MPRN', 'MPRN');

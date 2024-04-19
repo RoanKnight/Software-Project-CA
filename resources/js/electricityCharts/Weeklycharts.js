@@ -84,6 +84,19 @@ export function weeklyChart() {
         };
       });
 
+      let peakUsageWeek = weeklyElectricityConsumption[0].week;
+      let maxEnergy = weeklyElectricityConsumption[0].totalEnergy;
+
+      weeklyElectricityConsumption.forEach(item => {
+        if (item.totalEnergy > maxEnergy) {
+          maxEnergy = item.totalEnergy;
+          peakUsageWeek = item.week;
+        }
+      });
+
+      // Display the peak usage week
+      document.querySelector('.peakUsageTimes').textContent = `Your peak usage week started on: ${peakUsageWeek.toDateString()}`;
+
       // Calculate total and average energy consumption
       const totalEnergy = weeklyElectricityConsumption.reduce((total, item) => total + item.totalEnergy, 0);
       document.querySelector('.totalEnergy').textContent = totalEnergy.toFixed(2) + " kWh";
@@ -113,8 +126,8 @@ export function weeklyChart() {
         const averageDifference = currentMonthAverage - previousMonthAverage;
 
         // Determine comparison direction
-        const comparison = totalDifference > 0 ? 'more' : 'less';
-        const colorClass = comparison === 'more' ? 'text-green-500' : 'text-red-500';
+        const comparison = totalDifference > 0 ? 'less' : 'more';
+        const colorClass = comparison === 'more' ? 'text-red-500' : 'text-green-500';
 
         // Display comparison results
         const totalDifferenceElement = `<span class="${colorClass}">${Math.abs(totalDifference.toFixed(2))} kWh</span>`;

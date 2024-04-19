@@ -17,7 +17,7 @@ class CarCharging extends Model
         'location_MPRN'
     ];
 
-    // Define a relationship: car charging record belongs to a location
+    // car charging record belongs to a location
     public function location()
     {
         return $this->belongsTo(Location::class, 'location_MPRN', 'MPRN');

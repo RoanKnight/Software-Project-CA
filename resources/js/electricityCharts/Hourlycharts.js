@@ -94,7 +94,25 @@ export function hourlyChart() {
         const totalElectricityCost = totalEnergy * electricityRate;
         document.querySelector('.totalCost').textContent = `€${totalElectricityCost.toFixed(2)}`;
         const averageElectricityCost = averageEnergy * electricityRate;
-        document.querySelector('.averageCost').textContent = `€${averageElectricityCost.toFixed(2)}`;
+        document.querySelector('.averageCost').textContent = `€${averageElectricityCost.toFixed(2) * 12}`;
+
+        let peakUsageHour = 0;
+        let maxEnergy = 0;
+        let energyUsageByHour = Array(24).fill(0);
+
+        times.forEach((time, index) => {
+          const hour = parseInt(time.split(':')[0]);
+          energyUsageByHour[hour] += electricityConsumptionValues[index];
+
+          if (energyUsageByHour[hour] > maxEnergy) {
+            maxEnergy = energyUsageByHour[hour];
+            peakUsageHour = hour;
+          }
+        });
+
+        let peakUsageHourElement = document.querySelector('.peakUsageTimes');
+        let nextHour = (peakUsageHour + 1) % 24;
+        peakUsageHourElement.textContent = `Your peak usage hour was from ${peakUsageHour}:00 to ${nextHour}:00`;
 
         // Compare today's data with yesterday's data if available
         if (yesterdayData) {
@@ -105,8 +123,8 @@ export function hourlyChart() {
           const totalDifference = totalEnergy - yesterdayTotalEnergy;
           const averageDifference = averageEnergy - yesterdayAverageEnergy;
 
-          const comparison = (totalDifference > 0 && averageDifference > 0) ? 'more' : 'less';
-          const colorClass = comparison === 'more' ? 'text-green-500' : 'text-red-500';
+          const comparison = (totalDifference > 0 && averageDifference > 0) ? 'less' : 'more';
+          const colorClass = comparison === 'more' ? 'text-red-500' : 'text-green-500';
 
           const totalDifferenceElement = `<span class="${colorClass}">${Math.abs(totalDifference.toFixed(2))} kWh</span>`;
           document.querySelector('.previousTotal').innerHTML = `${totalDifferenceElement} ${comparison} than yesterday`;

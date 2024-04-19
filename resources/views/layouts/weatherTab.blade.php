@@ -3,8 +3,7 @@
   <div class="flex justify-between space-x-8">
     <div class="flex flex-col items-center">
       <h1 class="text-xl font-semibold">{{ date('l, j F', $weather['dt']) }}</h1>
-      <img src="http://openweathermap.org/img/w/{{ $weather['weather'][0]['icon'] }}" alt="Weather icon"
-        style="height: 100px">
+      <img src="http://openweathermap.org/img/wn/{{ $weather['weather'][0]['icon'] }}@2x.png" alt="Weather icon">
       <!-- Location name -->
       <h1 class="text-xl font-semibold">{{ $weather['name'] ?? 'N/A' }}</h1>
     </div>
@@ -19,7 +18,7 @@
         <!-- Day abbreviation -->
         <span class="uppercase">{{ date('D', strtotime($day)) }}</span>
         <!-- Weather icon -->
-        <img src="http://openweathermap.org/img/w/{{ $data['icon'] }}" alt="Weather icon">
+        <img src="http://openweathermap.org/img/wn/{{ $data['icon'] }}@2x.png" alt="Weather icon">
         <!-- Temperature for the day -->
         <span>{{ $data['temp'] }}°</span>
       </div>

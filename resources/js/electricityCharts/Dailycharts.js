@@ -68,6 +68,19 @@ export function dailyChart() {
         };
       });
 
+      let peakUsageDate = dailyElectricityConsumption[0].date;
+      let maxEnergy = dailyElectricityConsumption[0].totalEnergy;
+
+      dailyElectricityConsumption.forEach(item => {
+        if (item.totalEnergy > maxEnergy) {
+          maxEnergy = item.totalEnergy;
+          peakUsageDate = item.date;
+        }
+      });
+
+      // Display the peak usage date
+      document.querySelector('.peakUsageTimes').textContent = `Your peak usage date was: ${peakUsageDate}`;
+
       // Calculate total and average energy consumption
       const totalEnergy = dailyElectricityConsumption.reduce((total, item) => total + item.totalEnergy, 0);
       document.querySelector('.totalEnergy').textContent = totalEnergy.toFixed(2) + " kWh";
@@ -90,8 +103,8 @@ export function dailyChart() {
         const averageDifference = currentWeekAverage - previousWeekAverage;
 
         // Determine comparison direction
-        const comparison = totalDifference > 0 ? 'more' : 'less';
-        const colorClass = comparison === 'more' ? 'text-green-500' : 'text-red-500';
+        const comparison = totalDifference > 0 ? 'less' : 'more';
+        const colorClass = comparison === 'more' ? 'text-red-500' : 'text-green-500';
 
         // Display comparison results
         const totalDifferenceElement = `<span class="${colorClass}">${Math.abs(totalDifference.toFixed(2))} kWh</span>`;

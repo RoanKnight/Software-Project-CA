@@ -23,7 +23,7 @@
 </head>
 
 <body class="font-sans bg-background">
-  <div class="grid grid-cols-20 gap-6">
+  <div class="grid grid-cols-20 gap-10">
     <div class="relative my-4 w-56 md:hidden">
       <input class="peer hidden" type="checkbox" name="select-1" id="select-1" />
       <label for="select-1"
@@ -36,16 +36,16 @@
       </svg>
       <ul
         class="max-h-0 select-none flex-col overflow-hidden rounded-b-lg shadow-md transition-all duration-300 peer-checked:max-h-56 peer-checked:py-3">
-        <li class="cursor-pointer px-3 py-2 text-sm text-slate-600 hover:bg-blue-700 hover:text-white">
+        <li class="cursor-pointer px-3 py-3 text-sm text-slate-600 hover:bg-blue-700 hover:text-white">
           <a href="{{ route('solar.dashboard') }}">Solar dashboard</a>
         </li>
-        <li class="cursor-pointer px-3 py-2 text-sm text-slate-600 hover:bg-blue-700 hover:text-white">
+        <li class="cursor-pointer px-3 py-3 text-sm text-slate-600 hover:bg-blue-700 hover:text-white">
           <a href="{{ route('electricity.dashboard') }}">Electricity usage</a>
         </li>
-        <li class="cursor-pointer px-3 py-2 text-sm text-slate-600 hover:bg-blue-700 hover:text-white">
+        <li class="cursor-pointer px-3 py-3 text-sm text-slate-600 hover:bg-blue-700 hover:text-white">
           <a href="{{ route('carCharging.dashboard') }}">EV charging</a>
         </li>
-        <li class="cursor-pointer px-3 py-2 text-sm text-slate-600 hover:bg-blue-700 hover:text-white">
+        <li class="cursor-pointer px-3 py-3 text-sm text-slate-600 hover:bg-blue-700 hover:text-white">
           <a href="{{ route('chargingStations.dashboard') }}">Charging locations</a>
         </li>
       </ul>
@@ -77,45 +77,97 @@
       <x-logout-modal />
     </div>
 
-    <div class="col-span-20 md:col-span-16 xl:col-span-10 max-h-screen mx-4 mt-4">
+    <div class="col-span-20 md:col-span-16 xl:col-span-12 max-h-screen mx-4 mt-4">
       <div class="sm:-mx-6 lg:-mx-8 bg-white rounded-xl mb-6">
-        <div class="spy-2 sm:px-6 lg:px-8">
-            <table class="min-w-full text-left text-sm font-light dark:text-white">
-              <thead class="border-b border-neutral-200 font-medium dark:border-white/10">
-                <tr>
-                  <th scope="col" class="px-2 md:px-6 py-4 text-xs md:text-sm">Start time</th>
-                  <th scope="col" class="px-2 md:px-6 py-4 text-xs md:text-sm">End time</th>
-                  <th scope="col" class="px-2 md:px-6 py-4 text-xs md:text-sm">Charging Duration</th>
-                  <th scope="col" class="px-2 md:px-6 py-4 text-xs md:text-sm">Charging amount (kWh)</th>
-                  <th scope="col" class="px-2 md:px-6 py-4 text-xs md:text-sm">Location MRPN</th>
-                </tr>
-              </thead>
-              <tbody>
-                @forelse($recentCarChargings as $recentCarCharging)
-                  <tr
-                    class="border-b border-neutral-200 transition duration-300 ease-in-out hover:bg-neutral-100 dark:border-white/10 dark:hover:bg-neutral-600">
-                    <td class="px-2 md:px-6 py-4 text-xs md:text-sm font-medium">{{ $recentCarCharging->start_time }}</td>
-                    <td class="px-2 md:px-6 py-4 text-xs md:text-sm">{{ $recentCarCharging->end_time }}</td>
-                    <td class="px-2 md:px-6 py-4 text-xs md:text-sm">
-                      {{ \Carbon\Carbon::parse($recentCarCharging->end_time)->diffInMinutes(\Carbon\Carbon::parse($recentCarCharging->start_time)) }}
-                    </td>
-                    <td class="px-2 md:px-6 py-4 text-xs md:text-sm">{{ $recentCarCharging->charging_amount }}</td>
-                    <td class="px-2 md:px-6 py-4 text-xs md:text-sm">{{ $recentCarCharging->location_MPRN }}</td>
-                  @empty
-                    <!-- Displayed when no car chargings are found -->
-                    <h4>No Car Chargings found!</h4>
-                @endforelse
-              </tbody>
-            </table>
+        <h1 class="pl-8 text-base md:text-xl py-4 font-bold border-b">Your recent charging sessions</h1>
+        <div class="spy-3 sm:px-6 lg:px-8">
+          <table class="min-w-full text-left text-sm font-light dark:text-white">
+            <thead class="border-b border-neutral-200 font-medium dark:border-white/10">
+              <tr>
+                <th scope="col" class="px-2 md:px-6 py-3 text-xs md:text-sm">Start time</th>
+                <th scope="col" class="px-2 md:px-6 py-3 text-xs md:text-sm">End time</th>
+                <th scope="col" class="px-2 md:px-6 py-3 text-xs md:text-sm">Charging Duration (minutes)</th>
+                <th scope="col" class="px-2 md:px-6 py-3 text-xs md:text-sm">Charging amount (kWh)</th>
+                <th scope="col" class="px-2 md:px-6 py-3 text-xs md:text-sm">Location MRPN</th>
+              </tr>
+            </thead>
+            <tbody>
+              @forelse($recentCarChargings as $recentCarCharging)
+                <tr
+                  class="border-b border-neutral-200 transition duration-300 ease-in-out hover:bg-neutral-100 dark:border-white/10 dark:hover:bg-neutral-600">
+                  <td class="px-2 md:px-6 py-3 text-xs md:text-sm font-medium">{{ $recentCarCharging->start_time }}</td>
+                  <td class="px-2 md:px-6 py-3 text-xs md:text-sm">{{ $recentCarCharging->end_time }}</td>
+                  <td class="px-2 md:px-6 py-3 text-xs md:text-sm">
+                    {{ \Carbon\Carbon::parse($recentCarCharging->end_time)->diffInMinutes(\Carbon\Carbon::parse($recentCarCharging->start_time)) }}
+                  </td>
+                  <td class="px-2 md:px-6 py-3 text-xs md:text-sm">{{ $recentCarCharging->charging_amount }}</td>
+                  <td class="px-2 md:px-6 py-3 text-xs md:text-sm">{{ $recentCarCharging->location_MPRN }}</td>
+                @empty
+                  <!-- Displayed when no car chargings are found -->
+                  <h4>No Car Chargings found!</h4>
+              @endforelse
+            </tbody>
+          </table>
         </div>
       </div>
 
       <div class="bg-white p-8 rounded-3xl sm:-mx-6 lg:-mx-8">
         <div class="flex items-center justify-between mb-6">
-          <h1 class="text-lg md:text-xl lg:text-2xl xl:text-3xl">Total car charging energy by day</h1>
+          <h1 class="text-base md:text-xl font-bold">Daily Energy Consumption for Car Charging</h1>
         </div>
 
         <div class="bg-gray-100 chargingChart rounded-xl"></div>
+      </div>
+    </div>
+
+    <div class="col-span-3 max-h-screen mt-4">
+      <div class="relative p-6 rounded-2xl bg-white shadow dark:bg-gray-800">
+        <div class="text-lg font-semibold">
+          <h2 class="mb-6 mt-2 text-xl">Total car charging cost</h2>
+        </div>
+        <div class="text-3xl font-bold border-b mb-4">
+          <span class="totalCost"></span>
+        </div>
+
+        <div class="text-lg font-semibold">
+          <h2 class="mb-6 mt-2 text-xl">Total energy consumed</h2>
+        </div>
+        <div class="text-3xl font-bold border-b">
+          <span class="totalEnergy"></span>
+        </div>
+      </div>
+      <div class="relative p-6 rounded-2xl bg-white shadow dark:bg-gray-800 mt-5">
+        <div class="text-lg font-semibold">
+          <h2 class="mb-6 mt-2 text-xl">Average Cost Per Session</h2>
+        </div>
+        <div class="text-3xl font-bold border-b mb-4">
+          <span class="avgCostPerSession"></span>
+        </div>
+
+        <div class="text-lg font-semibold">
+          <h2 class="mb-6 mt-2 text-xl">Average Energy per session</h2>
+        </div>
+        <div class="text-3xl font-bold border-b">
+          <span class="avgEnergyPerSession"></span>
+        </div>
+      </div>
+      <div class="relative p-6 rounded-2xl bg-white shadow dark:bg-gray-800 mt-5">
+        <div class="text-lg font-semibold">
+          <h2 class="mb-6 mt-2 text-xl">Average Cost Per kWh</h2>
+          <h2 class="mb-4 font-light">Average cost per kwh across all sessions</h2>
+        </div>
+        <div class="text-3xl font-bold">
+          <span class="avgCostPerKWh"></span>
+        </div>
+      </div>
+      <div class="relative p-6 rounded-2xl bg-white shadow dark:bg-gray-800 mt-5">
+        <div class="text-lg font-semibold">
+          <h2 class="mb-6 mt-2 text-xl">Average Charging Time</h2>
+          <h2 class="mb-4 font-light">Average charging time across all sessions</h2>
+        </div>
+        <div class="text-3xl font-bold">
+          <span class="avgChargingTime"></span>
+        </div>
       </div>
     </div>
   </div>

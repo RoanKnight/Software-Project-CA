@@ -15,7 +15,7 @@ class ElectricityUsage extends Model
     'deleted'
   ];
 
-  // Define a relationship: electricity usage belongs to a location
+  // Electricity usage belongs to a location
   public function location()
   {
     return $this->belongsTo(Location::class, 'location_MPRN', 'MPRN');

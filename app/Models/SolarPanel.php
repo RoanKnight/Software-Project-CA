@@ -15,7 +15,7 @@ class SolarPanel extends Model
     'deleted'
   ];
 
-  // Define a relationship: a solar panel belongs to a location
+  // A solar panel belongs to a location
   public function location()
   {
     return $this->belongsTo(Location::class, 'location_MPRN', 'MPRN');

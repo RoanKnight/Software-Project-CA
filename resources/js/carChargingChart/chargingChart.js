@@ -11,7 +11,7 @@ fetch('/carCharging/get-charging-data') // Fetch car charging data from the serv
       left: 50
     };
     const width = 460 - margin.left - margin.right;
-    const height = 230 - margin.top - margin.bottom;
+    const height = 200 - margin.top - margin.bottom;
 
     // Create SVG container for the chart
     const svg = d3.select(".chargingChart")
@@ -20,7 +20,7 @@ fetch('/carCharging/get-charging-data') // Fetch car charging data from the serv
       .append("g")
       .attr("transform", `translate(${margin.left},${margin.top})`);
 
-    // Process the data to aggregate charging amounts by date
+    // Make an array of charging sessions grouped by date
     const data = carChargings.reduce((acc, charging) => {
       const date = new Date(charging.start_time).toISOString().split('T')[0];
       const chargingAmount = Number(charging.charging_amount);
@@ -38,6 +38,46 @@ fetch('/carCharging/get-charging-data') // Fetch car charging data from the serv
       return acc;
     }, []);
 
+    const sessionData = carChargings.map(charging => {
+      const sessionStart = new Date(charging.start_time).toISOString();
+      const sessionEnd = new Date(charging.end_time).toISOString();
+      const chargingAmount = Number(charging.charging_amount);
+
+      return {
+        sessionStart: sessionStart,
+        sessionEnd: sessionEnd,
+        chargingAmount: chargingAmount
+      };
+    });
+
+    let costPerKWh = 0.35;
+    let totalCost = sessionData.reduce((total, session) => total + session.chargingAmount * costPerKWh, 0);
+    document.querySelector('.totalCost').textContent = `€${totalCost.toFixed(2)}`;
+
+    let avgCostPerSession = totalCost / sessionData.length;
+    document.querySelector('.avgCostPerSession').textContent = `€${avgCostPerSession.toFixed(2)}`;
+
+    let totalEnergy = sessionData.reduce((total, session) => total + session.chargingAmount, 0);
+    let avgCostPerKWh = totalCost / totalEnergy;
+    document.querySelector('.avgCostPerKWh').textContent = `€${avgCostPerKWh.toFixed(2)}`;
+
+    document.querySelector('.totalEnergy').textContent = `${totalEnergy.toFixed(2)} kWh`;
+
+    let avgEnergyPerSession = totalEnergy / sessionData.length;
+    document.querySelector('.avgEnergyPerSession').textContent = `${avgEnergyPerSession.toFixed(2)} kWh`;
+
+    let totalChargingTime = sessionData.reduce((total, session) => {
+      let startTime = new Date(session.sessionStart);
+      let endTime = new Date(session.sessionEnd);
+      let difference = endTime - startTime;
+      return total + difference;
+    }, 0);
+
+    let avgChargingTime = totalChargingTime / sessionData.length;
+    avgChargingTime = avgChargingTime / 1000 / 60;
+    document.querySelector('.avgChargingTime').textContent = `${avgChargingTime.toFixed(2)} minutes`;
+
+
     // Define scales for x and y axes
     const x = d3.scaleBand()
       .range([0, width])
@@ -47,7 +87,7 @@ fetch('/carCharging/get-charging-data') // Fetch car charging data from the serv
       .attr("transform", `translate(0,${height})`)
       .call(d3.axisBottom(x).tickFormat(d => {
         const date = new Date(d);
-        return d3.timeFormat("%d %b")(date); // Format date for display
+        return d3.timeFormat("%d %b")(date); b
       }))
       .selectAll("text")
       .attr("transform", "translate(-10,0)rotate(-45)")

@@ -25,9 +25,9 @@ class User extends Authenticatable
     'name',
     'email',
     'password',
-    'role', // User role (admin or user)
-    'deleted', // Indicates if the user is deleted
-    'active_MPRN' // Indicates the active MPRN (Meter Point Reference Number)
+    'role',
+    'deleted',
+    'active_MPRN'
   ];
 
   /**
@@ -36,8 +36,8 @@ class User extends Authenticatable
    * @var array<int, string>
    */
   protected $hidden = [
-    'password', // Hide password field for security reasons
-    'remember_token', // Hide remember token
+    'password',
+    'remember_token'
   ];
 
   /**
@@ -46,17 +46,17 @@ class User extends Authenticatable
    * @var array<string, string>
    */
   protected $casts = [
-    'email_verified_at' => 'datetime', // Cast email_verified_at to datetime
-    'password' => 'hashed' // Hash the password
+    'email_verified_at' => 'datetime',
+    'password' => 'hashed'
   ];
 
-  // Define a relationship: a user can have many locations
+  // A user can have many locations
   public function locations()
   {
     return $this->hasMany(Location::class);
   }
 
-  // Define a relationship: a user has one active location
+  // A user has one active location
   public function activeLocation()
   {
     return $this->hasOne(Location::class, 'MPRN', 'active_MPRN');

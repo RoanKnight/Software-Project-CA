@@ -76,11 +76,11 @@
 
     <div class="col-span-20 md:col-span-16 xl:col-span-12 max-h-screen mx-4">
       <p class="text-sm md:text-lg font-light mt-6 mb-6">General overview</p>
-      <h1 class="text-xl sm:text-2xl lg:text-4xl font-medium mb-10">Your energy generation metrics</h1>
+      <h1 class="text-xl sm:text-2xl lg:text-4xl font-medium mb-10">Your electricity usage metrics</h1>
 
       <div class="bg-white p-8 rounded-3xl mb-4">
         <div class="flex items-center justify-between mb-10">
-          <h1 class="text-lg md:text-xl lg:text-2xl xl:text-3xl">Your solar panel energy generation</h1>
+          <h1 class="text-lg md:text-xl lg:text-2xl xl:text-3xl">Your electricity consumption</h1>
           <select name="" class="text-xs md:text-base rounded-xl ml-4">
             <option value="hourly">Hourly</option>
             <option value="daily">Daily</option>
@@ -94,13 +94,13 @@
 
       <div class="bg-white p-6 lg:p-10 rounded-3xl w-full flex justify-between solarData">
         <div>
-          <h2 class="text-sm md:text-base lg:text-lg xl:text-2xl font-medium mb-8">Total energy generated</h2>
+          <h2 class="text-sm md:text-base lg:text-lg xl:text-2xl font-medium mb-8">Total electricity consumed</h2>
           <h3 class="text-lg md:text-xl lg:text-2xl xl:text-3xl font-semibold mb-5 totalEnergy"></h3>
           <p class="previousTotal text-xs md:text-sm lg:text-lg"></p>
         </div>
 
         <div>
-          <h2 class="text-sm md:text-base lg:text-lg xl:text-2xl font-medium mb-8">Average energy generation</h2>
+          <h2 class="text-sm md:text-base lg:text-lg xl:text-2xl font-medium mb-8">Average electricity usage</h2>
           <h3 class="text-lg md:text-xl lg:text-2xl xl:text-3xl font-semibold mb-5 averageEnergy"></h3>
           <p class="averageComparison text-xs md:text-sm lg:text-lg"></p>
         </div>
@@ -109,15 +109,16 @@
           $currentEnergy = rand(1, 2) / 10.0;
           $previousEntry = rand(1, 2) / 10.0;
           $comparison = $currentEnergy > $previousEntry ? 'more' : 'less';
-          $colorClass = $currentEnergy > $previousEntry ? 'text-green-500' : 'text-red-500';
+          $colorClass = $currentEnergy > $previousEntry ? 'text-red-500' : 'text-green-500';
           $averageEnergy = rand(1, 2) / 10.0;
           $projectedCost = $currentEnergy * 0.12;
         @endphp
 
         <div>
-          <h2 class="text-xl mb-8">Current electrcity consumption</h2>
-          <h3 class="text-3xl mb-5 currentEnergy">{{ $currentEnergy }} kWh</h3>
-          <p class="comparison"><span
+          <h2 class="text-sm md:text-base lg:text-lg xl:text-2xl font-medium mb-8">Current electricity usage</h2>
+          <h3 class="text-lg md:text-xl lg:text-2xl xl:text-3xl font-semibold mb-5 currentEnergy">{{ $currentEnergy }}
+            kWh</h3>
+          <p class="comparison text-xs md:text-sm lg:text-lg"><span
               class="currentComparison {{ $colorClass }}">{{ abs($currentEnergy - $previousEntry) }}</span> kWh
             {{ $comparison }} than previous hour</p>
         </div>
@@ -125,26 +126,37 @@
       </div>
     </div>
 
-    <div class="col-span-3 flex flex-col max-h-screen">
-      <div class="bg-white h-fit mt-40 px-5 py-10 rounded-3xl flex-shrink-0">
-        <h2 class="text-2xl mb-6 font-semibold">Estimated Total Cost</h2>
-        <h3 class="text-lg mb-6">Your total electricity cost</h3>
-        <h1 class="text-3xl font-bold totalCost"></h1>
+    <div class="col-span-3 flex flex-col max-h-screen mt-40">
+      <div class="relative p-6 rounded-2xl bg-white shadow dark:bg-gray-800">
+        <div class="text-lg font-semibold">
+          <h2 class="mb-6 mt-2 text-xl">Total electricity cost</h2>
+          <h2 class="mb-4 font-light">Your total electricity cost</h2>
+        </div>
+        <div class="text-3xl font-bold">
+          <span class="totalCost"></span>
+        </div>
+        <div class="flex items-center text-sm font-medium">
+          <span class="mt-6 costComparison"></span>
+        </div>
       </div>
-      <div class="bg-white h-fit mt-5 px-5 py-10 rounded-3xl">
-        <h2 class="text-2xl mb-6 font-semibold">Estimated average cost</h2>
-        <h3 class="text-lg mb-6">Your average electricity cost</h3>
-        <h1 class="text-3xl font-bold averageCost"></h1>
+      <div class="relative p-6 rounded-2xl bg-white shadow dark:bg-gray-800 mt-5">
+        <div class="text-lg font-semibold">
+          <h2 class="mb-6 mt-2 text-xl">Estimated average cost</h2>
+          <h2 class="mb-4 font-light">Your average electricity cost</h2>
+        </div>
+        <div class="text-3xl font-bold">
+          <span class="averageCost"></span>
+        </div>
       </div>
-      <div class="bg-white h-fit mt-5 px-5 py-10 rounded-3xl">
-        <h2 class="text-2xl mb-6 font-semibold">Electricity cost comparison</h2>
-        <h3 class="text-lg mb-6 costComparison"></h3>
-      </div>
-      <div class="bg-white h-fit mt-5 px-5 py-10 rounded-3xl">
-        <h2 class="text-2xl mb-6 font-semibold">Projected Costs</h2>
-        <h3 class="text-lg mb-6">Based on current usage, your projected cost is</h3>
-        <h1 class="text-3xl font-bold projectedCost">{{ $projectedCost }}</h1>
-      </div>
+      <div class="relative p-6 rounded-2xl bg-white shadow dark:bg-gray-800 mt-5">
+        <div class="text-lg font-semibold">
+            <h2 class="mb-6 mt-2 text-xl">Peak Usage Times</h2>
+            <h2 class="mb-4 font-light">Your highest electricity usage times</h2>
+        </div>
+        <div class="text-xl font-medium">
+            <span class="peakUsageTimes"></span>
+        </div>
+    </div>
     </div>
   </div>
 </body>
