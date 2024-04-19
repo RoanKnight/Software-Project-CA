@@ -5,17 +5,21 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\CarCharging;
 use App\Models\Location;
+use App\Services\OpenChargeMapService;
 use App\Models\User;
 use Carbon\Carbon;
 
 class CarChargingController extends Controller
 {
-  public function __construct()
+  protected $openChargeMapService;
+
+  public function __construct(OpenChargeMapService $openChargeMapService)
   {
-    // Middleware to ensure authentication is required for all methods except 'index'
+    // Middleware to ensure authentication is required for all methods
     $this->middleware('auth', ['except' => []]);
     // Middleware to ensure only admin users can access 'index' method
     $this->middleware('role:admin', ['only' => ['index']]);
+    $this->openChargeMapService = $openChargeMapService;
   }
 
   // Display a listing of the resource.
@@ -109,9 +113,7 @@ class CarChargingController extends Controller
     $carChargings = collect();
     $recentCarChargings = collect();
 
-    // Check if an active location exists
     if ($activeLocation) {
-      // Retrieve all car charging records for the active location
       $carChargings = CarCharging::where('location_MPRN', $activeLocation->MPRN)->get();
       // Retrieve the most recent car charging records for the active location
       $recentCarChargings = CarCharging::where('location_MPRN', $activeLocation->MPRN)
@@ -126,6 +128,15 @@ class CarChargingController extends Controller
       'carChargings' => $carChargings,
       'recentCarChargings' => $recentCarChargings,
       'activeLocation' => $activeLocation,
+    ]);
+  }
+
+  public function chargingStations()
+  {
+    $stations = $this->openChargeMapService->getStations(53.3498, -6.2603, 10);
+
+    return view('carCharging.chargingStations', [
+      'stations' => $stations
     ]);
   }
 

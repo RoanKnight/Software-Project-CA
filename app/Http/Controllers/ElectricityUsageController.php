@@ -20,13 +20,10 @@ class ElectricityUsageController extends Controller
     $this->middleware('role:admin', ['only' => ['delete', 'restore', 'index']]);
   }
 
-  // Display a listing of the resource.
   public function index()
   {
-    // Retrieve all electricity usages and locations
     $electricityUsages = ElectricityUsage::all();
     $locations = Location::all();
-    // Return the 'electricity.index' view with electricity usage and location data
     return view('electricity.index', [
       'electricityUsages' => $electricityUsages,
       'locations' => $locations
@@ -36,9 +33,7 @@ class ElectricityUsageController extends Controller
   // Show the form for creating a new resource.
   public function create()
   {
-    // Retrieve all locations
     $locations = Location::all();
-    // Return the 'electricity.create' view with location data
     return view('electricity.create', [
       'locations' => $locations,
     ]);
@@ -47,12 +42,10 @@ class ElectricityUsageController extends Controller
   // Store a newly created resource in storage.
   public function store(Request $request)
   {
-    // Define validation rules for the request
     $rules = [
       'location_id' => 'required|exists:locations,MPRN',
     ];
 
-    // Define custom error messages for validation
     $messages = [
       'location_id.required' => 'The location field is required.'
     ];
@@ -81,14 +74,12 @@ class ElectricityUsageController extends Controller
     // Create an empty JSON file for electricity usage data storage
     Storage::put($electricityJson, json_encode([]));
 
-    // Redirect to the 'electricity.index' route with a success message
-    return redirect()->route('electricity.index')->with('status', 'Created a new electricity usage');
+    return redirect()->back()->with('status', 'Electricity usage created successfully');
   }
 
   // Update electricity usage data for all users and locations.
   public function updateElectricityData()
   {
-    // Retrieve all users
     $users = User::all();
 
     // Iterate through each user
@@ -158,13 +149,11 @@ class ElectricityUsageController extends Controller
   // Retrieve electricity usage data for the active user's location.
   public function getElectricityData()
   {
-    // Fetch the active location MPRN from the User model
     $activeLocationMPRN = auth()->user()->active_MPRN;
 
-    // Find the location with the active MPRN
     $location = Location::where('MPRN', $activeLocationMPRN)->first();
 
-    // If no location found, return a 404 error response
+    // If no location found, return an error
     if (!$location) {
       return response()->json(['error' => 'No active location found.'], 404);
     }
@@ -198,7 +187,7 @@ class ElectricityUsageController extends Controller
       // Return the formatted electricity consumption data
       return response()->json($electricityConsumptionValues);
     } else {
-      // If the file does not exist, return a 404 error response
+      // If the file does not exist, return an error
       return response()->json(['error' => 'File does not exist.'], 404);
     }
   }
@@ -206,14 +195,12 @@ class ElectricityUsageController extends Controller
   // Display the dashboard with electricity usage data.
   public function dashboard()
   {
-    // Retrieve the authenticated user
     $user = auth()->user();
-    // Retrieve locations associated with the authenticated user
     $locations = Location::where('user_id', auth()->id())->get();
     // Retrieve electricity usage based on the associated location MPRNs
     $electricityUsage = ElectricityUsage::whereIn('location_MPRN', $locations->pluck('MPRN'))->get();
 
-    // Return the 'electricity.dashboard' view with user, electricity usage, and location data
+    // Return the 'electricity.dashboard' view with specified data
     return view('electricity.dashboard', [
       'user' => $user,
       'electricityUsage' => $electricityUsage,
@@ -224,10 +211,8 @@ class ElectricityUsageController extends Controller
   // Display the specified resource.
   public function show(string $id)
   {
-    // Find the electricity usage with the specified ID
     $electricityUsage = ElectricityUsage::findOrFail($id);
 
-    // Return the 'electricity.show' view with the electricity usage data
     return view('electricity.show', [
       'electricityUsage' => $electricityUsage
     ]);

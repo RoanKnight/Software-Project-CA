@@ -23,7 +23,7 @@
     <header>
       <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
         <button class="modeToggler bg-background text-tableHeadingText">
-          <img id="modeIcon" src="/images/Light-mode.png" alt="" style="width: 30px; height: 30px;">
+          {{-- <img id="modeIcon" src="/images/Light-mode.png" alt="" style="width: 30px; height: 30px;"> --}}
         </button>
       </div>
     </header>

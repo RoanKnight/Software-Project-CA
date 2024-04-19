@@ -3,7 +3,6 @@
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\SolarPanelController;
 use App\Http\Controllers\ElectricityUsageController;
-use App\Http\Controllers\ChargingStationController;
 use App\Http\Controllers\CarChargingController;
 use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\LocationController;
@@ -85,18 +84,6 @@ Route::prefix('electricity')->group(function () {
   Route::patch('/{electricityUsage}/restore', [ElectricityUsageController::class, 'restore'])->name('electricity.restore');
 });
 
-// Grouping charging station related routes
-Route::prefix('chargingStations')->group(function () {
-  // Charging station routes
-  Route::get('/', [ChargingStationController::class, 'index'])->name('chargingStations.index');
-  Route::get('/create', [ChargingStationController::class, 'create'])->name('chargingStations.create');
-  Route::post('/', [ChargingStationController::class, 'store'])->name('chargingStations.store');
-  Route::get('/dashboard', [ChargingStationController::class, 'dashboard'])->name('chargingStations.dashboard');
-  Route::get('/{chargingStation}', [ChargingStationController::class, 'show'])->name('chargingStations.show');
-  Route::delete('/{chargingStation}', [ChargingStationController::class, 'destroy'])->name('chargingStations.destroy');
-  Route::patch('/{chargingStation}/restore', [ChargingStationController::class, 'restore'])->name('chargingStations.restore');
-});
-
 // Grouping car charging related routes
 Route::prefix('carCharging')->group(function () {
   // Car charging routes
@@ -105,6 +92,7 @@ Route::prefix('carCharging')->group(function () {
   Route::post('/', [CarChargingController::class, 'store'])->name('carCharging.store');
   Route::get('/get-charging-data', [CarChargingController::class, 'getChargingData'])->name('carCharging.getChargingData');
   Route::get('/dashboard', [CarChargingController::class, 'dashboard'])->name('carCharging.dashboard');
+  Route::get('/chargingStations', [CarChargingController::class, 'chargingStations'])->name('carCharging.chargingStations');
   Route::get('/{id}', [CarChargingController::class, 'show'])->name('carCharging.show');
 });
 

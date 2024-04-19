@@ -21,7 +21,7 @@
       <a href="{{ route('carCharging.dashboard') }}">EV charging</a>
     </li>
     <li class="cursor-pointer px-3 py-2 text-sm text-slate-600 hover:bg-blue-700 hover:text-white">
-      <a href="{{ route('chargingStations.dashboard') }}">Charging locations</a>
+      <a href="{{ route('carCharging.chargingStations') }}">Charging locations</a>
     </li>
   </ul>
 </div>

@@ -11,7 +11,7 @@
         'route' => 'logout',
         'image' => '/images/Log-out-icon.png',
         'title' => 'Log out',
-        'onclick' => "event.preventDefault(); openModal('.logoutModal')", // JavaScript function to handle logout confirmation modal
+        'onclick' => "event.preventDefault(); openModal('.logoutModal')",
       ],
   ];
 @endphp

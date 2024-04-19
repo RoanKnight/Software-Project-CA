@@ -63,17 +63,7 @@ class LocationController extends Controller
     $rules = [
       'MPRN' => 'required|digits:11|unique:locations,MPRN',
       'address' => 'required|string|max:255',
-      'EirCode' => [
-        'required',
-        'string',
-        'size:7',
-        'regex:/^[A-Z0-9]+$/',
-        function ($attribute, $value, $fail) {
-          if (Location::where('EirCode', $value)->where('user_id', Auth::id())->exists()) {
-            $fail('You cannot create another location with the same EirCode.');
-          }
-        },
-      ],
+      'EirCode' => 'required|string|size:7|regex:/^[A-Z0-9]{4}[ -]?[A-Z0-9]{3}$/',
     ];
 
     // Validation messages
@@ -136,23 +126,7 @@ class LocationController extends Controller
     // Validation rules
     $rules = [
       'address' => 'required|string|max:255',
-      'EirCode' => [
-        'required',
-        'string',
-        'size:7',
-        'regex:/^[A-Z0-9]+$/',
-        function ($attribute, $value, $fail) use ($location) {
-          // Exclude the current location from the query
-          if (
-            Location::where('EirCode', $value)
-              ->where('user_id', Auth::id())
-              ->where('MPRN', '!=', $location->MPRN)
-              ->exists()
-          ) {
-            $fail('You cannot update the EirCode to one that already exists.');
-          }
-        },
-      ],
+      'EirCode' => 'required|string|regex:/^[A-Z0-9]{3}[ -]?[A-Z0-9]{4}$/',
     ];
 
     // Validation messages
@@ -184,8 +158,8 @@ class LocationController extends Controller
     // Save the changes to the location
     $location->save();
 
-    // Redirect back to the index page with a success message
-    return redirect()->route('locations.index')->with('status', 'Location updated successfully');
+    // Redirect back to the previous page with a success message
+    return redirect()->route('profile.edit')->with('status', 'Location updated successfully');
   }
 
   // Set the active location for the current authenticated user

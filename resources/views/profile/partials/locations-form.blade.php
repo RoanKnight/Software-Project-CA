@@ -27,18 +27,19 @@
         <h3 class="px-6 mt-2">Address: {{ $location->address }}</h3>
         <h3 class="px-6 mt-2">EirCode: <span class="font-semibold">{{ $location->EirCode }}</span></h3>
         <div class="flex px-6 mt-2 items-center">
-          <form method="POST" action="{{ route('locations.destroy', $location->MPRN) }}" class="mr-4">
+          <form method="POST" action="{{ route('locations.destroy', $location->MPRN) }}" class="mr-4 inline-block">
             @csrf
             @method('DELETE')
-            <button type="submit" class="text-black hover:text-gray-500">Delete</button>
+            <button type="submit" class="text-blue-500 hover:text-blue-800">Delete</button>
           </form>
 
-          <a href="{{ route('locations.edit', $location->MPRN) }}" class="mr-4">Edit</a>
+          <a href="{{ route('locations.edit', $location->MPRN) }}"
+            class="mr-4 text-blue-500 hover:text-blue-800">Edit</a>
 
           @if (auth()->user()->active_MPRN != $location->MPRN)
-            <form method="POST" action="{{ route('setActiveLocation', $location->MPRN) }}">
+            <form method="POST" action="{{ route('setActiveLocation', $location->MPRN) }}" class="inline-block">
               @csrf
-              <button type="submit">Make Active</button>
+              <button type="submit" class="text-blue-500 hover:text-blue-800">Make Active</button>
             </form>
           @endif
         </div>

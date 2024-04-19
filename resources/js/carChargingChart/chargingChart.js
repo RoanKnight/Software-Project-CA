@@ -38,6 +38,7 @@ fetch('/carCharging/get-charging-data') // Fetch car charging data from the serv
       return acc;
     }, []);
 
+    // Create an array of all individual charging sessions
     const sessionData = carChargings.map(charging => {
       const sessionStart = new Date(charging.start_time).toISOString();
       const sessionEnd = new Date(charging.end_time).toISOString();
@@ -51,21 +52,30 @@ fetch('/carCharging/get-charging-data') // Fetch car charging data from the serv
     });
 
     let costPerKWh = 0.35;
+
+    // Calculate total cost for individual sessions
     let totalCost = sessionData.reduce((total, session) => total + session.chargingAmount * costPerKWh, 0);
     document.querySelector('.totalCost').textContent = `€${totalCost.toFixed(2)}`;
 
+    // Calculate average cost per session for individual sessions
     let avgCostPerSession = totalCost / sessionData.length;
     document.querySelector('.avgCostPerSession').textContent = `€${avgCostPerSession.toFixed(2)}`;
 
+    // Calculate total energy consumed for individual sessions
     let totalEnergy = sessionData.reduce((total, session) => total + session.chargingAmount, 0);
+
+    // Calculate average cost per kWh for individual sessions
     let avgCostPerKWh = totalCost / totalEnergy;
     document.querySelector('.avgCostPerKWh').textContent = `€${avgCostPerKWh.toFixed(2)}`;
 
+    // Display the total energy consumed for individual sessions
     document.querySelector('.totalEnergy').textContent = `${totalEnergy.toFixed(2)} kWh`;
 
+    // Calculate average energy per session for individual sessions
     let avgEnergyPerSession = totalEnergy / sessionData.length;
     document.querySelector('.avgEnergyPerSession').textContent = `${avgEnergyPerSession.toFixed(2)} kWh`;
 
+    // Calculate total charging time
     let totalChargingTime = sessionData.reduce((total, session) => {
       let startTime = new Date(session.sessionStart);
       let endTime = new Date(session.sessionEnd);
@@ -73,9 +83,13 @@ fetch('/carCharging/get-charging-data') // Fetch car charging data from the serv
       return total + difference;
     }, 0);
 
+    // Calculate average charging time
     let avgChargingTime = totalChargingTime / sessionData.length;
+    // Convert average charging time to minutes
     avgChargingTime = avgChargingTime / 1000 / 60;
+    // Display the average charging time
     document.querySelector('.avgChargingTime').textContent = `${avgChargingTime.toFixed(2)} minutes`;
+
 
 
     // Define scales for x and y axes

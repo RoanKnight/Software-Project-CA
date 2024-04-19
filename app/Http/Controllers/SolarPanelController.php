@@ -24,39 +24,31 @@ class SolarPanelController extends Controller
     $this->weatherService = $weatherService;
   }
 
-  // Display a listing of the resource.
   public function index()
   {
-    // Retrieve all solar panels and locations
     $solarPanels = SolarPanel::all();
     $locations = Location::all();
-    // Return the 'solar.index' view with solar panel and location data
     return view('solar.index', [
       'solarPanels' => $solarPanels,
       'locations' => $locations,
     ]);
   }
 
-  // Show the form for creating a new resource.
   public function create()
   {
     // Retrieve locations associated with the authenticated user
     $locations = Location::where('user_id', auth()->id())->get();
-    // Return the 'solar.create' view with location data
     return view('solar.create', [
       'locations' => $locations,
     ]);
   }
 
-  // Store a newly created resource in storage.
   public function store(Request $request)
   {
-    // Define validation rules for the request
     $rules = [
       'location_id' => 'required|exists:locations,MPRN',
     ];
 
-    // Define custom error messages for validation
     $messages = [
       'location_id.required' => 'The location field is required.',
     ];
@@ -82,17 +74,13 @@ class SolarPanelController extends Controller
 
     // Define the path for the solar JSON file
     $solarJsonPath = $locationDirectory . '/solar.json';
-    // Create an empty JSON file for solar panel data storage
     Storage::put($solarJsonPath, json_encode([]));
 
-    // Redirect to the 'solar.index' route with a success message
-    return redirect()->route('solar.index')->with('status', 'Created a new solar panel');
+    return redirect()->back()->with('status', 'Solar panel created successfully');
   }
 
-  // Update solar panel data for all users and locations.
   public function updateSolarData()
   {
-    // Retrieve all users
     $users = User::all();
     // Define the location for weather data retrieval
     $location = 'Dún Laoghaire, IE';
@@ -104,10 +92,8 @@ class SolarPanelController extends Controller
 
     // Iterate through each user
     foreach ($users as $user) {
-      // Retrieve locations associated with the current user
       $locations = Location::where('user_id', $user->id)->get();
 
-      // Iterate through each location
       foreach ($locations as $location) {
         // Generate the path for the solar JSON file
         $address = str_replace(' ', '_', $location->address);
@@ -167,13 +153,12 @@ class SolarPanelController extends Controller
   // Retrieve solar panel data for the active user's location.
   public function getSolarData()
   {
-    // Fetch the active location MPRN from the User model
     $activeLocationMPRN = auth()->user()->active_MPRN;
 
     // Find the location with the active MPRN
     $location = Location::where('MPRN', $activeLocationMPRN)->first();
 
-    // If no location found, return a 404 error response
+    // If no location found, return an error
     if (!$location) {
       return response()->json(['error' => 'No active location found.'], 404);
     }
@@ -207,7 +192,7 @@ class SolarPanelController extends Controller
       // Return the formatted energy generation data
       return response()->json($energyGenerationValues);
     } else {
-      // If the file does not exist, return a 404 error response
+      // If the file does not exist, return an error
       return response()->json(['error' => 'File does not exist.'], 404);
     }
   }
@@ -215,9 +200,7 @@ class SolarPanelController extends Controller
   // Display the dashboard with solar panel and weather data.
   public function dashboard()
   {
-    // Retrieve the authenticated user
     $user = auth()->user();
-    // Retrieve locations associated with the authenticated user
     $locations = Location::where('user_id', auth()->id())->get();
     // Retrieve solar panels based on the associated location MPRNs
     $solarPanels = SolarPanel::whereIn('location_MPRN', $locations->pluck('MPRN'))->get();
@@ -243,7 +226,7 @@ class SolarPanelController extends Controller
       }
     }
 
-    // Return the 'solar.dashboard' view with user, solar panel, location, weather, and forecast data
+    // Return the 'solar.dashboard' view with specified data
     return view('solar.dashboard', [
       'user' => $user,
       'solarPanels' => $solarPanels,
@@ -256,10 +239,8 @@ class SolarPanelController extends Controller
   // Display the specified resource.
   public function show(string $id)
   {
-    // Find the solar panel with the specified ID
     $solarPanel = SolarPanel::findOrFail($id);
 
-    // Return the 'solar.show' view with the solar panel data
     return view('solar.show', [
       'solarPanel' => $solarPanel,
     ]);

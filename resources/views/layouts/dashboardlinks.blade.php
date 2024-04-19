@@ -12,7 +12,7 @@
   // Initializing an array to hold dashboard links
   $dashboardLinks = [
       [
-          'route' => 'chargingStations.dashboard',
+          'route' => 'carCharging.chargingStations',
           'title' => 'Charging Locations',
       ],
   ];

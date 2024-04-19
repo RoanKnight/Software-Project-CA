@@ -58,10 +58,8 @@ class RegisteredUserController extends Controller
     $userDirectory = 'users/' . $user->email;
     Storage::makeDirectory($userDirectory);
 
-    // Trigger the Registered event
     event(new Registered($user));
 
-    // Log in the newly registered user
     Auth::login($user);
 
     // Redirect to the registered user's home page

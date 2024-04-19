@@ -40,7 +40,7 @@
             </x-nav-link>
           @endif
 
-          <x-nav-link :href="route('chargingStations.dashboard')" :active="request()->routeIs('chargingStations.dashboard')">
+          <x-nav-link :href="route('carCharging.chargingStations')" :active="request()->routeIs('chargingStations.dashboard')">
             {{ __('Charging Stations') }}
           </x-nav-link>
         </div>
